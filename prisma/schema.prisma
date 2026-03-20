@@ -1,0 +1,329 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+}
+
+// ==================== AUTH & USERS ====================
+
+model User {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  email          String   @unique
+  password       String?
+  image          String?
+  authority      String[] @default(["user"])
+  emailVerified  DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  accounts       Account[]
+  sessions       Session[]
+  activityLogs   ActivityLog[]
+  notifications  Notification[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+
+// ==================== CUSTOMERS ====================
+
+model Customer {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  firstName      String
+  lastName       String
+  email          String   @unique
+  phone          String?
+  image          String?
+  status         String   @default("active") // active, blocked
+  totalSpending  Float    @default(0)
+
+  // Personal info
+  location       String?
+  address        String?
+  city           String?
+  country        String?
+  postcode       String?
+  birthday       DateTime?
+  gender         String?
+  facebook       String?
+  twitter        String?
+  pinterest      String?
+  linkedIn       String?
+
+  orders         Order[]
+  paymentMethods PaymentMethod[]
+  subscriptions  Subscription[]
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("customers")
+}
+
+model PaymentMethod {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  customerId  String  @db.ObjectId
+  cardType    String
+  last4Number String
+  expMonth    String
+  expYear     String
+  primary     Boolean @default(false)
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("payment_methods")
+}
+
+model Subscription {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  customerId String  @db.ObjectId
+  plan       String
+  status     String  @default("active")
+  billing    String
+  amount     Float
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+// ==================== PRODUCTS ====================
+
+model Product {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  sku         String   @unique
+  price       Float
+  stock       Int      @default(0)
+  status      String   @default("published") // published, draft, inactive
+  category    String?
+  brand       String?
+  taxRate     Float    @default(0)
+  images      String[]
+  tags        String[]
+
+  orderItems  OrderItem[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("products")
+}
+
+// ==================== ORDERS ====================
+
+model Order {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  customerId      String   @db.ObjectId
+  status          Int      @default(0) // 0=pending, 1=paid, 2=shipped, 3=delivered
+  paymentMethod   String?
+  paymentId       String?
+  totalAmount     Float
+  shippingAddress String?
+  shippingCity    String?
+  shippingCountry String?
+  shippingZip     String?
+  note            String?
+
+  customer        Customer    @relation(fields: [customerId], references: [id])
+  items           OrderItem[]
+  timeline        OrderTimeline[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  orderId   String @db.ObjectId
+  productId String @db.ObjectId
+  name      String
+  quantity  Int
+  price     Float
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model OrderTimeline {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderId String   @db.ObjectId
+  action  String
+  date    DateTime @default(now())
+  note    String?
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("order_timeline")
+}
+
+
+// ==================== PROJECTS ====================
+
+model Project {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  category    String?
+  status      String   @default("in-progress") // in-progress, completed, on-hold
+  progress    Int      @default(0)
+  startDate   DateTime?
+  dueDate     DateTime?
+  memberIds   String[] @db.ObjectId
+
+  tasks       Task[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("projects")
+}
+
+model Task {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  projectId   String?  @db.ObjectId
+  title       String
+  description String?
+  status      String   @default("todo") // todo, in-progress, review, done
+  priority    String   @default("medium") // low, medium, high, critical
+  assigneeId  String?
+  dueDate     DateTime?
+  tags        String[]
+
+  project     Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  comments    TaskComment[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("tasks")
+}
+
+model TaskComment {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  taskId  String   @db.ObjectId
+  userId  String
+  content String
+  date    DateTime @default(now())
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@map("task_comments")
+}
+
+// ==================== ACTIVITY & LOGS ====================
+
+model ActivityLog {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  action    String
+  entity    String?  // customer, order, product, project
+  entityId  String?
+  details   String?
+  date      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("activity_logs")
+}
+
+model Notification {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  title     String
+  message   String
+  type      String   @default("info") // info, warning, success, error
+  read      Boolean  @default(false)
+  date      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+// ==================== CHANGELOG ====================
+
+model Changelog {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  version   String?
+  message   String
+  author    String?
+  commitHash String?
+  type      String   @default("update") // feature, fix, update, breaking
+  date      DateTime @default(now())
+
+  @@map("changelog")
+}
+
+// ==================== HELP CENTER ====================
+
+model Article {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  title      String
+  content    String
+  category   String
+  slug       String   @unique
+  published  Boolean  @default(false)
+  viewCount  Int      @default(0)
+  authors    String[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("articles")
+}
+
+// ==================== FILES ====================
+
+model File {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  fileType  String
+  size      Int
+  url       String
+  folder    String?
+  uploadedBy String?
+
+  createdAt DateTime @default(now())
+
+  @@map("files")
+}

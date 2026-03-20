@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Auto Changelog Update",
+  "description": "When the agent finishes making changes, automatically update the changelog page with a summary of what was changed, including commit-style messages and timestamps.",
+  "version": "1",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Review the changes that were just made in this session. Update the file src/data/changelog.json by appending a new entry with: date (today), version (increment patch from last entry or use 1.2.7), type (feature/fix/update), and a concise message describing what changed. If the file doesn't exist, create it as a JSON array. Also check git status for any uncommitted changes and include relevant file names in the changelog entry. Keep entries concise and professional."
+  }
+}

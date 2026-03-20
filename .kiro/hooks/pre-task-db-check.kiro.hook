@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Pre-Task DB Consistency Check",
+  "description": "Before any task in a spec starts execution, remind the agent to check the Prisma schema and existing server actions to ensure consistency with the database models.",
+  "version": "1",
+  "when": {
+    "type": "preTaskExecution"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Before starting this task, quickly review prisma/schema.prisma to ensure you understand the current database models. When creating or modifying any server action, always use Prisma client from '@/lib/prisma' and never import from mock data files under src/mock/. Ensure all data shapes returned match what the frontend components expect."
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Database Schema Validator",
+  "description": "After any write operation to server actions or API routes, validate that the database schema is consistent and Prisma imports are correct.",
+  "version": "1",
+  "when": {
+    "type": "postToolUse",
+    "toolTypes": [
+      "write"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Check if the file that was just written/modified is under src/server/actions/ or src/app/api/. If so, verify that: 1) It imports from '@/lib/prisma' instead of mock data, 2) The Prisma model names used match the schema in prisma/schema.prisma, 3) The field names in queries match the schema. If issues are found, fix them silently. If the file is not a server action or API route, do nothing."
+  }
+}

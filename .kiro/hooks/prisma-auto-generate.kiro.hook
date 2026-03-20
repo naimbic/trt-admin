@@ -1,0 +1,17 @@
+{
+  "enabled": true,
+  "name": "Prisma Auto Generate",
+  "description": "When Prisma schema file is edited, automatically regenerate the Prisma client to keep types in sync.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "prisma/schema.prisma"
+    ]
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "npx prisma generate",
+    "timeout": 30
+  }
+}
