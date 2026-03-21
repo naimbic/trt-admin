@@ -4,7 +4,7 @@ const Page = () => {
         <>
             <h6>Prerequisites</h6>
             <p>
-                Before getting started with Ecme, ensure your development
+                Before getting started with trtdigital, ensure your development
                 environment has the following tools installed:
             </p>
             <div className="mt-6">
@@ -30,7 +30,7 @@ const Page = () => {
                 </ul>
             </div>
             <div className="mt-8">
-                <h6>Installing Ecme</h6>
+                <h6>Installing trtdigital</h6>
                 <p>
                     After extracting the downloaded .zip file, you&apos;ll find
                     two folders <strong>TypeScript</strong> and{' '}

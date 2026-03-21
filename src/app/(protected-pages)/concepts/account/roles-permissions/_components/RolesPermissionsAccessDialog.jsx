@@ -13,6 +13,9 @@ import { accessModules } from '../constants'
 import classNames from '@/utils/classNames'
 import isLastChild from '@/utils/isLastChild'
 import sleep from '@/utils/sleep'
+import { apiPutRole } from '@/services/AccontsService'
+import Notification from '@/components/ui/Notification'
+import toast from '@/components/ui/toast'
 import {
     TbUserCog,
     TbBox,
@@ -58,24 +61,86 @@ const RolesPermissionsAccessDialog = () => {
             type: '',
             open: false,
         })
+        setAccessRight({})
+    }
+
+    const handleDelete = async () => {
+        if (!selectedRole || selectedRole === 'admin') return
+        try {
+            await apiPutRole({ action: 'delete', roleId: selectedRole })
+            setRoleList(roleList.filter((r) => r.id !== selectedRole))
+            toast.push(
+                <Notification type="success">Role deleted</Notification>,
+                { placement: 'top-center' },
+            )
+        } catch {
+            toast.push(
+                <Notification type="danger">Failed to delete role</Notification>,
+                { placement: 'top-center' },
+            )
+        }
+        handleClose()
+        await sleep(300)
+        setSelectedRole('')
     }
 
     const handleUpdate = async () => {
+        try {
+            const role = roleList.find((r) => r.id === selectedRole)
+            if (role) {
+                await apiPutRole({
+                    action: 'update',
+                    roleId: role.id,
+                    name: role.name,
+                    description: role.description,
+                    accessRight: role.accessRight,
+                })
+                toast.push(
+                    <Notification type="success">Role updated</Notification>,
+                    { placement: 'top-center' },
+                )
+            }
+        } catch {
+            toast.push(
+                <Notification type="danger">Failed to update role</Notification>,
+                { placement: 'top-center' },
+            )
+        }
         handleClose()
         await sleep(300)
         setSelectedRole('')
     }
 
     const handleSubmit = async () => {
-        const newRoleList = structuredClone(roleList)
-        newRoleList.push({
-            id: newId,
-            name: roleNameRef.current?.value || `Untitle-${newId}`,
-            description: descriptionRef.current?.value || '',
-            users: [],
-            accessRight,
-        })
-        setRoleList(newRoleList)
+        const roleName = roleNameRef.current?.value || `Untitled-${newId}`
+        const roleId = roleName.toLowerCase().replace(/\s+/g, '-')
+        try {
+            await apiPutRole({
+                action: 'create',
+                roleId,
+                name: roleName,
+                description: descriptionRef.current?.value || '',
+                accessRight,
+            })
+            const newRoleList = structuredClone(roleList)
+            newRoleList.push({
+                id: roleId,
+                name: roleName,
+                description: descriptionRef.current?.value || '',
+                users: [],
+                accessRight,
+            })
+            setRoleList(newRoleList)
+            toast.push(
+                <Notification type="success">Role created</Notification>,
+                { placement: 'top-center' },
+            )
+        } catch {
+            toast.push(
+                <Notification type="danger">Failed to create role</Notification>,
+                { placement: 'top-center' },
+            )
+        }
         handleClose()
     }
 
@@ -83,18 +148,18 @@ const RolesPermissionsAccessDialog = () => {
         return roleList.find((role) => role.id === selectedRole)
     }, [selectedRole, roleList])
 
-    const handleChange = (accessRight, key) => {
+    const handleChange = (newAccess, key) => {
         if (roleDialog.type === 'new') {
-            setAccessRight((value) => {
-                value[key] = accessRight
-                return value
-            })
+            setAccessRight((prev) => ({
+                ...prev,
+                [key]: newAccess,
+            }))
         }
 
         if (roleDialog.type === 'edit') {
             const newRoleList = structuredClone(roleList).map((role) => {
                 if (role.id === selectedRole) {
-                    role.accessRight[key] = accessRight
+                    role.accessRight[key] = newAccess
                 }
 
                 return role
@@ -152,7 +217,11 @@ const RolesPermissionsAccessDialog = () => {
                                 <Segment
                                     className="bg-transparent dark:bg-transparent"
                                     selectionType="multiple"
-                                    value={modules?.accessRight[module.id]}
+                                    value={
+                                        roleDialog.type === 'new'
+                                            ? accessRight[module.id] || []
+                                            : modules?.accessRight[module.id] || []
+                                    }
                                     onChange={(val) =>
                                         handleChange(val, module.id)
                                     }
@@ -202,24 +271,39 @@ const RolesPermissionsAccessDialog = () => {
                             </div>
                         </div>
                     ))}
-                    <div className="flex justify-end mt-6">
-                        <Button
-                            className="ltr:mr-2 rtl:ml-2"
-                            variant="plain"
-                            onClick={handleClose}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            variant="solid"
-                            onClick={
-                                roleDialog.type === 'edit'
-                                    ? handleUpdate
-                                    : handleSubmit
-                            }
-                        >
-                            {roleDialog.type === 'edit' ? 'Update' : 'Create'}
-                        </Button>
+                    <div className="flex justify-between mt-6">
+                        <div>
+                            {roleDialog.type === 'edit' && selectedRole !== 'admin' && (
+                                <Button
+                                    variant="plain"
+                                    customColorClass={() =>
+                                        'text-error hover:text-error'
+                                    }
+                                    onClick={handleDelete}
+                                >
+                                    Delete role
+                                </Button>
+                            )}
+                        </div>
+                        <div className="flex">
+                            <Button
+                                className="ltr:mr-2 rtl:ml-2"
+                                variant="plain"
+                                onClick={handleClose}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="solid"
+                                onClick={
+                                    roleDialog.type === 'edit'
+                                        ? handleUpdate
+                                        : handleSubmit
+                                }
+                            >
+                                {roleDialog.type === 'edit' ? 'Update' : 'Create'}
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </ScrollBar>

@@ -1,5 +1,5 @@
 const pageMeta = {
-    title: 'Ecme - The Ultimate Next & TypeScript Web Template',
+    title: 'trtdigital - CRM & Company Management',
     description:
         'Admin Template and Starter Kit with React, Tailwind Components and Next.js',
     icons: {

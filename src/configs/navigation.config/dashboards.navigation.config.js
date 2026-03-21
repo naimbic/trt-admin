@@ -3,7 +3,7 @@ import {
     NAV_ITEM_TYPE_TITLE,
     NAV_ITEM_TYPE_ITEM,
 } from '@/constants/navigation.constant'
-import { ADMIN, USER } from '@/constants/roles.constant'
+import { ADMIN, USER, SUPERVISOR, SUPPORT, AUDITOR, REPORTS_READ } from '@/constants/roles.constant'
 
 const dashboardsNavigationConfig = [
     {
@@ -13,7 +13,7 @@ const dashboardsNavigationConfig = [
         translateKey: 'nav.dashboard.dashboard',
         icon: 'dashboard',
         type: NAV_ITEM_TYPE_TITLE,
-        authority: [ADMIN, USER],
+        authority: [ADMIN, USER, SUPERVISOR, SUPPORT, AUDITOR, REPORTS_READ],
         meta: {
             horizontalMenu: {
                 layout: 'default',
@@ -27,7 +27,7 @@ const dashboardsNavigationConfig = [
                 translateKey: 'nav.dashboard.ecommerce',
                 icon: 'dashboardEcommerce',
                 type: NAV_ITEM_TYPE_ITEM,
-                authority: [ADMIN, USER],
+                authority: [ADMIN, USER, SUPERVISOR, SUPPORT, AUDITOR, REPORTS_READ],
                 subMenu: [],
             },
             {
@@ -37,7 +37,7 @@ const dashboardsNavigationConfig = [
                 translateKey: 'nav.dashboard.project',
                 icon: 'dashboardProject',
                 type: NAV_ITEM_TYPE_ITEM,
-                authority: [ADMIN, USER],
+                authority: [ADMIN, USER, SUPERVISOR, SUPPORT, AUDITOR, REPORTS_READ],
                 subMenu: [],
             },
             {
@@ -47,7 +47,7 @@ const dashboardsNavigationConfig = [
                 translateKey: 'nav.dashboard.marketing',
                 icon: 'dashboardMarketing',
                 type: NAV_ITEM_TYPE_ITEM,
-                authority: [ADMIN, USER],
+                authority: [ADMIN, USER, SUPERVISOR, SUPPORT, AUDITOR, REPORTS_READ],
                 subMenu: [],
             },
             {
@@ -57,7 +57,7 @@ const dashboardsNavigationConfig = [
                 translateKey: 'nav.dashboard.analytic',
                 icon: 'dashboardAnalytic',
                 type: NAV_ITEM_TYPE_ITEM,
-                authority: [ADMIN, USER],
+                authority: [ADMIN, USER, SUPERVISOR, SUPPORT, AUDITOR, REPORTS_READ],
                 subMenu: [],
             },
         ],

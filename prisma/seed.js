@@ -26,11 +26,20 @@ async function main() {
     await prisma.user.deleteMany()
 
     // Create admin user
-    const hashedPassword = await bcrypt.hash('123Qwe', 10)
+    const adminName = process.env.ADMIN_NAME || 'Admin'
+    const adminEmail = process.env.ADMIN_EMAIL
+    const adminPassword = process.env.ADMIN_PASSWORD
+
+    if (!adminEmail || !adminPassword) {
+        console.error('❌ ADMIN_EMAIL and ADMIN_PASSWORD must be set in .env')
+        process.exit(1)
+    }
+
+    const hashedPassword = await bcrypt.hash(adminPassword, 10)
     const admin = await prisma.user.create({
         data: {
-            name: 'TRT Admin',
-            email: 'admin@trtmaroc.com',
+            name: adminName,
+            email: adminEmail,
             password: hashedPassword,
             authority: ['admin', 'user'],
             image: '/img/avatars/thumb-1.jpg',

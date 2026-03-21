@@ -3,7 +3,7 @@ import authConfig from '@/configs/auth.config'
 import {
     authRoutes as _authRoutes,
     publicRoutes as _publicRoutes,
-    // protectedRoutes
+    protectedRoutes,
 } from '@/configs/routes.config'
 import { REDIRECT_URL_KEY } from '@/constants/app.constant'
 import appConfig from '@/configs/app.config'
@@ -51,17 +51,31 @@ export default auth((req) => {
         )
     }
 
-    /** Uncomment this and `import { protectedRoutes } from '@/configs/routes.config'` if you want to enable role based access */
-    // if (isSignedIn && nextUrl.pathname !== '/access-denied' && !nextUrl.pathname.startsWith(appConfig.apiPrefix)) {
-    //     const routeMeta = protectedRoutes[nextUrl.pathname]
-    //     const existingRoute = routeMeta
-    //     const includedRole = routeMeta?.authority.some((role) => req.auth?.user?.authority.includes(role))
-    //     if (existingRoute && !includedRole) {
-    //         return Response.redirect(
-    //             new URL('/access-denied', nextUrl),
-    //         )
-    //     }
-    // }
+    /** Role based access control */
+    if (isSignedIn && nextUrl.pathname !== '/access-denied' && !nextUrl.pathname.startsWith(appConfig.apiPrefix)) {
+        // Try exact match first, then dynamic route patterns
+        let routeMeta = protectedRoutes[nextUrl.pathname]
+        if (!routeMeta) {
+            for (const [pattern, meta] of Object.entries(protectedRoutes)) {
+                if (meta.dynamicRoute) {
+                    const regex = new RegExp('^' + pattern.replace(/\[[\w]+\]/g, '[^/]+') + '$')
+                    if (regex.test(nextUrl.pathname)) {
+                        routeMeta = meta
+                        break
+                    }
+                }
+            }
+        }
+        if (routeMeta && routeMeta.authority?.length > 0) {
+            const userAuth = req.auth?.user?.authority || []
+            // Admin role bypasses all permission checks
+            if (!userAuth.includes('admin') && !routeMeta.authority.some((role) => userAuth.includes(role))) {
+                return Response.redirect(
+                    new URL('/access-denied', nextUrl),
+                )
+            }
+        }
+    }
 })
 
 export const config = {

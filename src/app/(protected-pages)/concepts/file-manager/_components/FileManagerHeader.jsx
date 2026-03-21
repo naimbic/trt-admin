@@ -1,11 +1,66 @@
 'use client'
-import { Fragment } from 'react'
+import { Fragment, useState } from 'react'
 import Segment from '@/components/ui/Segment'
+import Button from '@/components/ui/Button'
+import Dialog from '@/components/ui/Dialog'
+import Input from '@/components/ui/Input'
 import UploadFile from './UploadFile'
 import { useFileManagerStore } from '../_store/useFileManagerStore'
-import { TbChevronRight, TbLayoutGrid, TbList } from 'react-icons/tb'
+import { apiCreateFolder } from '@/services/FileService'
+import { TbChevronRight, TbLayoutGrid, TbList, TbFolderPlus } from 'react-icons/tb'
 
-const FileManagerHeader = ({ onEntryClick, onDirectoryClick }) => {
+const NewFolderButton = ({ onCreated }) => {
+    const [open, setOpen] = useState(false)
+    const [name, setName] = useState('')
+    const [loading, setLoading] = useState(false)
+    const { openedDirectoryId } = useFileManagerStore()
+
+    const handleCreate = async () => {
+        if (!name.trim()) return
+        setLoading(true)
+        try {
+            await apiCreateFolder({
+                action: 'createFolder',
+                name: name.trim(),
+                folder: openedDirectoryId || undefined,
+            })
+            setOpen(false)
+            setName('')
+            onCreated?.()
+        } catch (e) {
+            console.error('Create folder error:', e)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    return (
+        <>
+            <Button icon={<TbFolderPlus />} onClick={() => setOpen(true)}>
+                New Folder
+            </Button>
+            <Dialog isOpen={open} onClose={() => setOpen(false)} onRequestClose={() => setOpen(false)}>
+                <h4>New Folder</h4>
+                <div className="mt-4">
+                    <Input
+                        placeholder="Folder name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+                    />
+                </div>
+                <div className="mt-4 flex justify-end gap-2">
+                    <Button size="sm" onClick={() => setOpen(false)}>Cancel</Button>
+                    <Button size="sm" variant="solid" loading={loading} disabled={!name.trim()} onClick={handleCreate}>
+                        Create
+                    </Button>
+                </div>
+            </Dialog>
+        </>
+    )
+}
+
+const FileManagerHeader = ({ onEntryClick, onDirectoryClick, onRefresh }) => {
     const { directories, layout, setLayout } = useFileManagerStore()
 
     const handleEntryClick = () => {
@@ -62,7 +117,8 @@ const FileManagerHeader = ({ onEntryClick, onDirectoryClick }) => {
                         <TbList />
                     </Segment.Item>
                 </Segment>
-                <UploadFile />
+                <UploadFile onUploaded={onRefresh} />
+                <NewFolderButton onCreated={onRefresh} />
             </div>
         </div>
     )

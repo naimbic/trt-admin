@@ -5,6 +5,7 @@ import withHeaderItem from '@/utils/hoc/withHeaderItem'
 import Link from 'next/link'
 import signOut from '@/server/actions/auth/handleSignOut'
 import useCurrentSession from '@/utils/hooks/useCurrentSession'
+import useProfileStore from '@/utils/hooks/useProfileStore'
 import {
     PiUserDuotone,
     PiGearDuotone,
@@ -32,14 +33,22 @@ const dropdownItemList = [
 
 const _UserDropdown = () => {
     const { session } = useCurrentSession()
+    const profileName = useProfileStore((s) => s.name)
+    const profileImage = useProfileStore((s) => s.image)
+    const profileEmail = useProfileStore((s) => s.email)
+
+    // Zustand store overrides session values when profile is saved
+    const displayName = profileName || session?.user?.name || 'Anonymous'
+    const displayEmail = profileEmail || session?.user?.email || 'No email available'
+    const displayImage = profileImage ?? session?.user?.image
 
     const handleSignOut = async () => {
         await signOut()
     }
 
     const avatarProps = {
-        ...(session?.user?.image
-            ? { src: session?.user?.image }
+        ...(displayImage
+            ? { src: displayImage }
             : { icon: <PiUserDuotone /> }),
     }
 
@@ -59,10 +68,10 @@ const _UserDropdown = () => {
                     <Avatar {...avatarProps} />
                     <div>
                         <div className="font-bold text-gray-900 dark:text-gray-100">
-                            {session?.user?.name || 'Anonymous'}
+                            {displayName}
                         </div>
                         <div className="text-xs">
-                            {session?.user?.email || 'No email available'}
+                            {displayEmail}
                         </div>
                     </div>
                 </div>

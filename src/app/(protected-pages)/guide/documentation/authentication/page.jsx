@@ -7,7 +7,7 @@ const Page = () => {
     return (
         <>
             <p>
-                Ecme uses NextAuth.js as the authentication solution, offering a
+                trtdigital uses NextAuth.js as the authentication solution, offering a
                 robust and flexible way to handle user authentication, it
                 supports custom authentication flows and provides a wide range
                 of authentication providers, including Google, GitHub, and more.

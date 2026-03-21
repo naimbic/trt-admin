@@ -4,7 +4,14 @@ import {
     NAV_ITEM_TYPE_COLLAPSE,
     NAV_ITEM_TYPE_ITEM,
 } from '@/constants/navigation.constant'
-import { ADMIN, USER } from '@/constants/roles.constant'
+import {
+    ADMIN, USER, SUPERVISOR, SUPPORT, AUDITOR, GUEST,
+    USERS_READ, USERS_WRITE,
+    PRODUCTS_READ, PRODUCTS_WRITE,
+    CONFIGURATIONS_READ, CONFIGURATIONS_WRITE,
+    FILES_READ,
+    REPORTS_READ, REPORTS_WRITE,
+} from '@/constants/roles.constant'
 
 const conceptsNavigationConfig = [
     {
@@ -14,7 +21,7 @@ const conceptsNavigationConfig = [
         translateKey: 'nav.concepts',
         icon: 'concepts',
         type: NAV_ITEM_TYPE_TITLE,
-        authority: [ADMIN, USER],
+        authority: [ADMIN, USER, SUPERVISOR, SUPPORT, AUDITOR, GUEST],
         meta: {
             horizontalMenu: {
                 layout: 'columns',
@@ -29,7 +36,7 @@ const conceptsNavigationConfig = [
                 translateKey: 'nav.conceptsAi.ai',
                 icon: 'ai',
                 type: NAV_ITEM_TYPE_COLLAPSE,
-                authority: [ADMIN, USER],
+                authority: [ADMIN, SUPERVISOR, SUPPORT, CONFIGURATIONS_READ],
                 meta: {
                     description: {
                         translateKey: 'nav.conceptsAi.aiDesc',
@@ -44,13 +51,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsAi.chat',
                         icon: 'aiChat',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey: 'nav.conceptsAi.chatDesc',
-                                label: 'AI-powered chat systems',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, SUPPORT, CONFIGURATIONS_READ],
+                        meta: { description: { translateKey: 'nav.conceptsAi.chatDesc', label: 'AI-powered chat systems' } },
                         subMenu: [],
                     },
                     {
@@ -60,13 +62,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsAi.image',
                         icon: 'aiImage',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey: 'nav.conceptsAi.imageDesc',
-                                label: 'AI image processing',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, SUPPORT, CONFIGURATIONS_READ],
+                        meta: { description: { translateKey: 'nav.conceptsAi.imageDesc', label: 'AI image processing' } },
                         subMenu: [],
                     },
                 ],
@@ -78,13 +75,8 @@ const conceptsNavigationConfig = [
                 translateKey: 'nav.conceptsProjects.projects',
                 icon: 'projects',
                 type: NAV_ITEM_TYPE_COLLAPSE,
-                authority: [ADMIN, USER],
-                meta: {
-                    description: {
-                        translateKey: 'nav.conceptsProjects.projectsDesc',
-                        label: 'Manage and track projects',
-                    },
-                },
+                authority: [ADMIN, SUPERVISOR, SUPPORT, USER, REPORTS_READ],
+                meta: { description: { translateKey: 'nav.conceptsProjects.projectsDesc', label: 'Manage and track projects' } },
                 subMenu: [
                     {
                         key: 'concepts.projects.scrumBoard',
@@ -93,14 +85,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsProjects.scrumBoard',
                         icon: 'projectScrumBoard',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsProjects.scrumBoardDesc',
-                                label: 'Manage your scrum workflow',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, SUPPORT, USER, REPORTS_READ],
+                        meta: { description: { translateKey: 'nav.conceptsProjects.scrumBoardDesc', label: 'Manage your scrum workflow' } },
                         subMenu: [],
                     },
                     {
@@ -110,14 +96,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsProjects.projectList',
                         icon: 'projectList',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsProjects.projectListDesc',
-                                label: 'Organize all projects',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, SUPPORT, USER, REPORTS_READ],
+                        meta: { description: { translateKey: 'nav.conceptsProjects.projectListDesc', label: 'Organize all projects' } },
                         subMenu: [],
                     },
                     {
@@ -127,14 +107,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsProjects.projectDetails',
                         icon: 'projectDetails',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsProjects.projectDetailsDesc',
-                                label: 'Project detailed information',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, SUPPORT, USER, REPORTS_READ],
+                        meta: { description: { translateKey: 'nav.conceptsProjects.projectDetailsDesc', label: 'Project detailed information' } },
                         subMenu: [],
                     },
                     {
@@ -144,14 +118,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsProjects.projectTasks',
                         icon: 'projectTask',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsProjects.projectTasksDesc',
-                                label: 'Manage project tasks',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, SUPPORT, USER, REPORTS_READ],
+                        meta: { description: { translateKey: 'nav.conceptsProjects.projectTasksDesc', label: 'Manage project tasks' } },
                         subMenu: [],
                     },
                     {
@@ -161,14 +129,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsProjects.projectIssue',
                         icon: 'projectIssue',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsProjects.projectIssueDesc',
-                                label: 'Resolve project issues',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, SUPPORT, USER, REPORTS_READ],
+                        meta: { description: { translateKey: 'nav.conceptsProjects.projectIssueDesc', label: 'Resolve project issues' } },
                         subMenu: [],
                     },
                 ],
@@ -180,13 +142,8 @@ const conceptsNavigationConfig = [
                 translateKey: 'nav.conceptsCustomers.customers',
                 icon: 'customers',
                 type: NAV_ITEM_TYPE_COLLAPSE,
-                authority: [ADMIN, USER],
-                meta: {
-                    description: {
-                        translateKey: 'nav.conceptsCustomers.customersDesc',
-                        label: 'Customer management',
-                    },
-                },
+                authority: [ADMIN, SUPERVISOR, SUPPORT, USERS_READ],
+                meta: { description: { translateKey: 'nav.conceptsCustomers.customersDesc', label: 'Customer management' } },
                 subMenu: [
                     {
                         key: 'concepts.customers.customerList',
@@ -195,14 +152,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsCustomers.customerList',
                         icon: 'customerList',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsCustomers.customerListDesc',
-                                label: 'List of all customers',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, SUPPORT, USERS_READ],
+                        meta: { description: { translateKey: 'nav.conceptsCustomers.customerListDesc', label: 'List of all customers' } },
                         subMenu: [],
                     },
                     {
@@ -212,14 +163,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsCustomers.customerEdit',
                         icon: 'customerEdit',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsCustomers.customerEditDesc',
-                                label: 'Edit customer info',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, USERS_WRITE],
+                        meta: { description: { translateKey: 'nav.conceptsCustomers.customerEditDesc', label: 'Edit customer info' } },
                         subMenu: [],
                     },
                     {
@@ -229,14 +174,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsCustomers.customerCreate',
                         icon: 'customerCreate',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsCustomers.customerCreateDesc',
-                                label: 'Add a new customer',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, USERS_WRITE],
+                        meta: { description: { translateKey: 'nav.conceptsCustomers.customerCreateDesc', label: 'Add a new customer' } },
                         subMenu: [],
                     },
                     {
@@ -246,14 +185,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsCustomers.customerDetails',
                         icon: 'customerDetails',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsCustomers.customerDetailsDesc',
-                                label: 'Detailed customer info',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, SUPPORT, USERS_READ],
+                        meta: { description: { translateKey: 'nav.conceptsCustomers.customerDetailsDesc', label: 'Detailed customer info' } },
                         subMenu: [],
                     },
                 ],
@@ -265,13 +198,8 @@ const conceptsNavigationConfig = [
                 translateKey: 'nav.conceptsProducts.products',
                 icon: 'products',
                 type: NAV_ITEM_TYPE_COLLAPSE,
-                authority: [ADMIN, USER],
-                meta: {
-                    description: {
-                        translateKey: 'nav.conceptsProducts.productsDesc',
-                        label: 'Product inventory management',
-                    },
-                },
+                authority: [ADMIN, SUPERVISOR, SUPPORT, USER, PRODUCTS_READ],
+                meta: { description: { translateKey: 'nav.conceptsProducts.productsDesc', label: 'Product inventory management' } },
                 subMenu: [
                     {
                         key: 'concepts.products.productList',
@@ -280,14 +208,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsProducts.productList',
                         icon: 'productList',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsProducts.productListDesc',
-                                label: 'All products listed',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, SUPPORT, USER, PRODUCTS_READ],
+                        meta: { description: { translateKey: 'nav.conceptsProducts.productListDesc', label: 'All products listed' } },
                         subMenu: [],
                     },
                     {
@@ -297,14 +219,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsProducts.productEdit',
                         icon: 'productEdit',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsProducts.productEditDesc',
-                                label: 'Edit product details',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, PRODUCTS_WRITE],
+                        meta: { description: { translateKey: 'nav.conceptsProducts.productEditDesc', label: 'Edit product details' } },
                         subMenu: [],
                     },
                     {
@@ -314,14 +230,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsProducts.productCreate',
                         icon: 'productCreate',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsProducts.productCreateDesc',
-                                label: 'Add new product',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, PRODUCTS_WRITE],
+                        meta: { description: { translateKey: 'nav.conceptsProducts.productCreateDesc', label: 'Add new product' } },
                         subMenu: [],
                     },
                 ],
@@ -333,13 +243,8 @@ const conceptsNavigationConfig = [
                 translateKey: 'nav.conceptsOrders.orders',
                 icon: 'orders',
                 type: NAV_ITEM_TYPE_COLLAPSE,
-                authority: [ADMIN, USER],
-                meta: {
-                    description: {
-                        translateKey: 'nav.conceptsOrders.ordersDesc',
-                        label: 'Customer orders management',
-                    },
-                },
+                authority: [ADMIN, SUPERVISOR, SUPPORT, PRODUCTS_READ],
+                meta: { description: { translateKey: 'nav.conceptsOrders.ordersDesc', label: 'Customer orders management' } },
                 subMenu: [
                     {
                         key: 'concepts.orders.orderList',
@@ -348,14 +253,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsOrders.orderList',
                         icon: 'orderList',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsOrders.orderListDesc',
-                                label: 'View all customer orders',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, SUPPORT, PRODUCTS_READ],
+                        meta: { description: { translateKey: 'nav.conceptsOrders.orderListDesc', label: 'View all customer orders' } },
                         subMenu: [],
                     },
                     {
@@ -365,14 +264,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsOrders.orderEdit',
                         icon: 'orderEdit',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsOrders.orderEditDesc',
-                                label: 'Edit order details',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, PRODUCTS_WRITE],
+                        meta: { description: { translateKey: 'nav.conceptsOrders.orderEditDesc', label: 'Edit order details' } },
                         subMenu: [],
                     },
                     {
@@ -382,14 +275,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsOrders.orderCreate',
                         icon: 'orderCreate',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsOrders.orderCreateDesc',
-                                label: 'Create new order',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, PRODUCTS_WRITE],
+                        meta: { description: { translateKey: 'nav.conceptsOrders.orderCreateDesc', label: 'Create new order' } },
                         subMenu: [],
                     },
                     {
@@ -399,14 +286,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsOrders.orderDetails',
                         icon: 'ordeDetails',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsOrders.orderDetailsDesc',
-                                label: 'Detailed order information',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, SUPPORT, PRODUCTS_READ],
+                        meta: { description: { translateKey: 'nav.conceptsOrders.orderDetailsDesc', label: 'Detailed order information' } },
                         subMenu: [],
                     },
                 ],
@@ -418,13 +299,8 @@ const conceptsNavigationConfig = [
                 translateKey: 'nav.conceptsAccount.account',
                 icon: 'account',
                 type: NAV_ITEM_TYPE_COLLAPSE,
-                authority: [ADMIN, USER],
-                meta: {
-                    description: {
-                        translateKey: 'nav.conceptsAccount.accountDesc',
-                        label: 'Account settings and info',
-                    },
-                },
+                authority: [ADMIN, USER, SUPERVISOR, SUPPORT, AUDITOR, GUEST],
+                meta: { description: { translateKey: 'nav.conceptsAccount.accountDesc', label: 'Account settings and info' } },
                 subMenu: [
                     {
                         key: 'concepts.account.settings',
@@ -433,14 +309,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsAccount.settings',
                         icon: 'accountSettings',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsAccount.settingsDesc',
-                                label: 'Configure your settings',
-                            },
-                        },
+                        authority: [ADMIN, USER, SUPERVISOR, SUPPORT, AUDITOR, GUEST],
+                        meta: { description: { translateKey: 'nav.conceptsAccount.settingsDesc', label: 'Configure your settings' } },
                         subMenu: [],
                     },
                     {
@@ -450,14 +320,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsAccount.activityLog',
                         icon: 'accountActivityLogs',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsAccount.activityLogDesc',
-                                label: 'View recent activities',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, AUDITOR, REPORTS_READ],
+                        meta: { description: { translateKey: 'nav.conceptsAccount.activityLogDesc', label: 'View recent activities' } },
                         subMenu: [],
                     },
                     {
@@ -467,14 +331,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsAccount.rolesPermissions',
                         icon: 'accountRoleAndPermission',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsAccount.rolesPermissionsDesc',
-                                label: 'Manage roles & permissions',
-                            },
-                        },
+                        authority: [ADMIN, CONFIGURATIONS_WRITE],
+                        meta: { description: { translateKey: 'nav.conceptsAccount.rolesPermissionsDesc', label: 'Manage roles & permissions' } },
                         subMenu: [],
                     },
                     {
@@ -484,13 +342,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsAccount.pricing',
                         icon: 'accountPricing',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey: 'nav.conceptsAccount.pricingDesc',
-                                label: 'View pricing plans',
-                            },
-                        },
+                        authority: [ADMIN, USER, SUPERVISOR, SUPPORT, AUDITOR, GUEST],
+                        meta: { description: { translateKey: 'nav.conceptsAccount.pricingDesc', label: 'View pricing plans' } },
                         subMenu: [],
                     },
                 ],
@@ -502,13 +355,8 @@ const conceptsNavigationConfig = [
                 translateKey: 'nav.conceptsHelpCenter.helpCenter',
                 icon: 'helpCenter',
                 type: NAV_ITEM_TYPE_COLLAPSE,
-                authority: [ADMIN, USER],
-                meta: {
-                    description: {
-                        translateKey: 'nav.conceptsHelpCenter.helpCenterDesc',
-                        label: 'Support and articles',
-                    },
-                },
+                authority: [ADMIN, SUPERVISOR, SUPPORT, USER, AUDITOR, REPORTS_READ],
+                meta: { description: { translateKey: 'nav.conceptsHelpCenter.helpCenterDesc', label: 'Support and articles' } },
                 subMenu: [
                     {
                         key: 'concepts.helpCenter.supportHub',
@@ -517,14 +365,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsHelpCenter.supportHub',
                         icon: 'helpCeterSupportHub',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsHelpCenter.supportHubDesc',
-                                label: 'Central support hub',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, SUPPORT, USER, AUDITOR, REPORTS_READ],
+                        meta: { description: { translateKey: 'nav.conceptsHelpCenter.supportHubDesc', label: 'Central support hub' } },
                         subMenu: [],
                     },
                     {
@@ -534,14 +376,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsHelpCenter.article',
                         icon: 'helpCeterArticle',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsHelpCenter.articleDesc',
-                                label: 'Read support articles',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, SUPPORT, USER, AUDITOR, REPORTS_READ],
+                        meta: { description: { translateKey: 'nav.conceptsHelpCenter.articleDesc', label: 'Read support articles' } },
                         subMenu: [],
                     },
                     {
@@ -551,14 +387,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsHelpCenter.editArticle',
                         icon: 'helpCeterEditArticle',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsHelpCenter.editArticleDesc',
-                                label: 'Modify article content',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, REPORTS_WRITE],
+                        meta: { description: { translateKey: 'nav.conceptsHelpCenter.editArticleDesc', label: 'Modify article content' } },
                         subMenu: [],
                     },
                     {
@@ -568,14 +398,8 @@ const conceptsNavigationConfig = [
                         translateKey: 'nav.conceptsHelpCenter.manageArticle',
                         icon: 'helpCeterManageArticle',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: [ADMIN, USER],
-                        meta: {
-                            description: {
-                                translateKey:
-                                    'nav.conceptsHelpCenter.manageArticleDesc',
-                                label: 'Article management',
-                            },
-                        },
+                        authority: [ADMIN, SUPERVISOR, REPORTS_WRITE],
+                        meta: { description: { translateKey: 'nav.conceptsHelpCenter.manageArticleDesc', label: 'Article management' } },
                         subMenu: [],
                     },
                 ],
@@ -587,13 +411,8 @@ const conceptsNavigationConfig = [
                 translateKey: 'nav.calendar',
                 icon: 'calendar',
                 type: NAV_ITEM_TYPE_ITEM,
-                authority: [ADMIN, USER],
-                meta: {
-                    description: {
-                        translateKey: 'nav.calendarDesc',
-                        label: 'Schedule and events',
-                    },
-                },
+                authority: [ADMIN, USER, SUPERVISOR, SUPPORT, AUDITOR],
+                meta: { description: { translateKey: 'nav.calendarDesc', label: 'Schedule and events' } },
                 subMenu: [],
             },
             {
@@ -603,13 +422,8 @@ const conceptsNavigationConfig = [
                 translateKey: 'nav.fileManager',
                 icon: 'fileManager',
                 type: NAV_ITEM_TYPE_ITEM,
-                authority: [ADMIN, USER],
-                meta: {
-                    description: {
-                        translateKey: 'nav.fileManagerDesc',
-                        label: 'Manage your files',
-                    },
-                },
+                authority: [ADMIN, SUPERVISOR, FILES_READ],
+                meta: { description: { translateKey: 'nav.fileManagerDesc', label: 'Manage your files' } },
                 subMenu: [],
             },
             {
@@ -619,13 +433,8 @@ const conceptsNavigationConfig = [
                 translateKey: 'nav.mail',
                 icon: 'mail',
                 type: NAV_ITEM_TYPE_ITEM,
-                authority: [ADMIN, USER],
-                meta: {
-                    description: {
-                        translateKey: 'nav.mailDesc',
-                        label: 'Manage your emails',
-                    },
-                },
+                authority: [ADMIN, USER, SUPERVISOR, SUPPORT],
+                meta: { description: { translateKey: 'nav.mailDesc', label: 'Manage your emails' } },
                 subMenu: [],
             },
             {
@@ -635,13 +444,8 @@ const conceptsNavigationConfig = [
                 translateKey: 'nav.chat',
                 icon: 'chat',
                 type: NAV_ITEM_TYPE_ITEM,
-                authority: [ADMIN, USER],
-                meta: {
-                    description: {
-                        translateKey: 'nav.chatDesc',
-                        label: 'Chat with friends',
-                    },
-                },
+                authority: [ADMIN, USER, SUPERVISOR, SUPPORT],
+                meta: { description: { translateKey: 'nav.chatDesc', label: 'Chat with friends' } },
                 subMenu: [],
             },
         ],

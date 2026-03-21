@@ -4,7 +4,10 @@ import { useState } from 'react'
 import StickyFooter from '@/components/shared/StickyFooter'
 import Button from '@/components/ui/Button'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
+import Notification from '@/components/ui/Notification'
+import toast from '@/components/ui/toast'
 import { useRolePermissionsStore } from '../_store/rolePermissionsStore'
+import { apiPutRolesUsers } from '@/services/AccontsService'
 import { TbChecks } from 'react-icons/tb'
 
 const RolesPermissionsUserSelected = () => {
@@ -25,12 +28,25 @@ const RolesPermissionsUserSelected = () => {
         setDeleteConfirmationOpen(false)
     }
 
-    const handleConfirmDelete = () => {
-        const newUserList = userList.filter((user) => {
-            return !selectedUser.some((selected) => selected.id === user.id)
-        })
-        setSelectAllUser([])
-        setUserList(newUserList)
+    const handleConfirmDelete = async () => {
+        const userIds = selectedUser.map((u) => u.id)
+        try {
+            await apiPutRolesUsers({ action: 'deleteUsers', userIds })
+            const newUserList = userList.filter(
+                (user) => !selectedUser.some((s) => s.id === user.id),
+            )
+            setSelectAllUser([])
+            setUserList(newUserList)
+            toast.push(
+                <Notification type="success">Users removed</Notification>,
+                { placement: 'top-center' },
+            )
+        } catch {
+            toast.push(
+                <Notification type="danger">Failed to delete users</Notification>,
+                { placement: 'top-center' },
+            )
+        }
         setDeleteConfirmationOpen(false)
     }
 

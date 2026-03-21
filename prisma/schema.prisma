@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 // ==================== AUTH & USERS ====================
@@ -16,6 +17,35 @@ model User {
   image          String?
   authority      String[] @default(["user"])
   emailVerified  DateTime?
+
+  // Profile fields
+  firstName      String?
+  lastName       String?
+  phone          String?
+  dialCode       String?
+  country        String?
+  address        String?
+  city           String?
+  postcode       String?
+  birthday       String?
+  role           String?  @default("user")
+  status         String?  @default("active")
+  lastOnline     Int?
+  title          String?
+
+  // Notification settings
+  notifDesktop          Boolean  @default(true)
+  notifUnreadBadge      Boolean  @default(false)
+  notifEmail            String[] @default([])
+  notifAbout            String?  @default("mentionsOnly")
+
+  // Billing / subscription
+  currentPlan           String?  @default("Business board basic")
+  planStatus            String?  @default("active")
+  billingCycle          String?  @default("monthly")
+  nextPaymentDate       Int?
+  planAmount            Float?   @default(59.9)
+
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -23,6 +53,9 @@ model User {
   sessions       Session[]
   activityLogs   ActivityLog[]
   notifications  Notification[]
+  paymentMethods UserPaymentMethod[]
+  transactions   Transaction[]
+  integrations   UserIntegration[]
 
   @@map("users")
 }
@@ -58,6 +91,55 @@ model Session {
   @@map("sessions")
 }
 
+
+// ==================== USER PAYMENT METHODS ====================
+
+model UserPaymentMethod {
+  id             String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String  @db.ObjectId
+  cardHolderName String
+  cardType       String  // VISA, MASTER
+  last4Number    String
+  expMonth       String
+  expYear        String
+  primary        Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_payment_methods")
+}
+
+// ==================== USER TRANSACTIONS ====================
+
+model Transaction {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  item   String
+  status String @default("pending") // pending, paid, failed
+  amount Float
+  date   Int    // unix timestamp
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
+}
+
+// ==================== USER INTEGRATIONS ====================
+
+model UserIntegration {
+  id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId String  @db.ObjectId
+  name   String
+  desc   String?
+  img    String?
+  type   String? // Cloud storage, Notifications and events, etc.
+  active Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
+  @@map("user_integrations")
+}
 
 // ==================== CUSTOMERS ====================
 
@@ -326,4 +408,243 @@ model File {
   createdAt DateTime @default(now())
 
   @@map("files")
+}
+
+// ==================== WEBSITE INTEGRATION (trtmaroc.com) ====================
+
+// Page interactions (views, likes, shares)
+model PageStat {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  slug  String @unique
+  views Int    @default(0)
+  likes Int    @default(0)
+  shares Int   @default(0)
+
+  @@map("page_stats")
+}
+
+// Page interaction events (timeline for analytics chart)
+model PageEvent {
+  id   String   @id @default(auto()) @map("_id") @db.ObjectId
+  slug String
+  type String   // view, like, share
+  date DateTime @default(now())
+
+  @@index([date])
+  @@index([slug])
+  @@map("page_events")
+}
+
+// Comments (per-slug, supports nesting via parentId)
+model Comment {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  slug     String
+  name     String
+  text     String
+  parentId String?  // for nested replies
+  likes    Int      @default(0)
+  date     DateTime @default(now())
+
+  @@index([slug])
+  @@map("comments")
+}
+
+// Form submissions (contact, audit, newsletter, lead, candidature)
+model Submission {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  form           String   // contact, audit-gratuit, audit-seo, audit-ads, audit-web, audit-social, audit-aeo, audit-analytics, newsletter, candidature, lead
+  name           String?
+  email          String?
+  phone          String?
+  company        String?
+  website        String?
+  needs          String?
+  budget         String?
+  budgetMin      String?
+  budgetMax      String?
+  deadline       String?
+  deadlineMonths String?
+  message        String?
+  read           Boolean  @default(false)
+  date           DateTime @default(now())
+
+  @@index([form])
+  @@index([date])
+  @@map("submissions")
+}
+
+// 404 error logs
+model ErrorLog {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  url      String
+  referrer String?
+  ua       String?  // user agent
+  date     DateTime @default(now())
+
+  @@index([date])
+  @@map("error_logs")
+}
+
+// ==================== CALENDAR ====================
+
+model CalendarEvent {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  start       DateTime
+  end         DateTime?
+  allDay      Boolean  @default(false)
+  color       String?
+  description String?
+  createdBy   String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("calendar_events")
+}
+
+// ==================== MAIL ====================
+
+model MailMessage {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  from      String
+  to        String[]
+  cc        String[]
+  subject   String
+  body      String
+  label     String?  // inbox, sent, draft, starred, trash
+  starred   Boolean  @default(false)
+  read      Boolean  @default(false)
+  attachments String[]
+
+  date      DateTime @default(now())
+
+  @@index([label])
+  @@map("mail_messages")
+}
+
+// ==================== CHAT ====================
+
+model ChatConversation {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String?  // group name, null for 1:1
+  participantIds String[]
+  lastMessage String?
+  lastMessageTime DateTime?
+
+  messages    ChatMessage[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("chat_conversations")
+}
+
+model ChatMessage {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  conversationId String   @db.ObjectId
+  senderId       String
+  content        String
+  type           String   @default("text") // text, image, file
+
+  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  date           DateTime @default(now())
+
+  @@index([conversationId])
+  @@map("chat_messages")
+}
+
+// ==================== INVOICING ====================
+
+model Invoice {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  number        String   @unique // TRT-2026-001
+  customerId    String?  @db.ObjectId
+  status        String   @default("draft") // draft, sent, paid, overdue, cancelled
+  type          String   @default("invoice") // invoice, devis (quote)
+  subtotal      Float    @default(0)
+  taxAmount     Float    @default(0)
+  total         Float    @default(0)
+  currency      String   @default("MAD")
+  notes         String?
+  dueDate       DateTime?
+  paidDate      DateTime?
+
+  items         InvoiceItem[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([customerId])
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  invoiceId   String @db.ObjectId
+  description String
+  quantity    Int    @default(1)
+  unitPrice   Float
+  total       Float
+
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@map("invoice_items")
+}
+
+// ==================== ROLES & PERMISSIONS ====================
+
+model Role {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  roleId        String   @unique // admin, supervisor, support, user, auditor, guest
+  name          String
+  description   String?
+  accessRight   Json     // { users: ['read','write'], products: ['read'], ... }
+  order         Int      @default(0)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("roles")
+}
+
+// ==================== PRICING PLANS ====================
+
+model PricingPlan {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  planId        String   @unique // basic, standard, pro
+  name          String
+  description   String?
+  monthlyPrice  Float
+  annualPrice   Float
+  features      String[] // feature IDs
+  recommended   Boolean  @default(false)
+  order         Int      @default(0)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("pricing_plans")
+}
+
+// ==================== HR / EMPLOYEES ====================
+
+model Employee {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  firstName   String
+  lastName    String
+  email       String   @unique
+  phone       String?
+  position    String?
+  department  String?
+  status      String   @default("active") // active, on-leave, terminated
+  hireDate    DateTime?
+  salary      Float?
+  image       String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("employees")
 }

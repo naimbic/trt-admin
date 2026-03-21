@@ -6,7 +6,9 @@ import Input from '@/components/ui/Input'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import { Form, FormItem } from '@/components/ui/Form'
 import classNames from '@/utils/classNames'
-import sleep from '@/utils/sleep'
+import { apiPutSettingsPassword } from '@/services/AccontsService'
+import Notification from '@/components/ui/Notification'
+import toast from '@/components/ui/toast'
 import isLastChild from '@/utils/isLastChild'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, Controller } from 'react-hook-form'
@@ -70,8 +72,23 @@ const SettingsSecurity = () => {
 
     const handlePostSubmit = async () => {
         setIsSubmitting(true)
-        await sleep(1000)
-        console.log('getValues', getValues())
+        try {
+            await apiPutSettingsPassword({
+                currentPassword: getValues('currentPassword'),
+                newPassword: getValues('newPassword'),
+            })
+            toast.push(
+                <Notification type="success">Password updated successfully</Notification>,
+                { placement: 'top-center' },
+            )
+        } catch (error) {
+            toast.push(
+                <Notification type="danger">
+                    {error?.response?.data?.error || 'Failed to update password'}
+                </Notification>,
+                { placement: 'top-center' },
+            )
+        }
         setConfirmationOpen(false)
         setIsSubmitting(false)
     }

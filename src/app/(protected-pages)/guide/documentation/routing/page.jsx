@@ -6,7 +6,7 @@ const Page = () => {
     return (
         <>
             <p>
-                Ecme routing follows the Next.js App Router conventions, it uses
+                trtdigital routing follows the Next.js App Router conventions, it uses
                 a file-based routing system where each file in the{' '}
                 <code>/app</code> directory corresponds to a route in your
                 application. Subfolders represent nested routes, making it easy
@@ -172,7 +172,7 @@ export const authRoutes = [
             <div className="mt-10" id="authority">
                 <h5>Authority</h5>
                 <p className="mt-1">
-                    Ecme routes support simple role-based access control. You
+                    trtdigital routes support simple role-based access control. You
                     can specify the roles that have access to a route by using
                     the <code>authority</code> field. For example, the following
                     route is only accessible to users with the{' '}

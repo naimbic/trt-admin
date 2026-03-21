@@ -80,19 +80,17 @@ const Navigation = ({ toggleMode, mode }) => {
                 </Drawer>
                 <Link href="/">
                     {mode === 'light' && (
-                        <Image
-                            src="/img/logo/logo-light-full.png"
-                            width={120}
-                            height={40}
-                            alt="logo"
+                        <img
+                            src="https://trtdigital-ma.ams3.digitaloceanspaces.com/wp-content/uploads/2021/08/trtDigital-Logo-Maroc-2.svg"
+                            style={{ width: 140, height: 'auto' }}
+                            alt="trtdigital logo"
                         />
                     )}
                     {mode === 'dark' && (
-                        <Image
-                            src="/img/logo/logo-dark-full.png"
-                            width={120}
-                            height={40}
-                            alt="logo"
+                        <img
+                            src="https://trtdigital-ma.ams3.digitaloceanspaces.com/wp-content/uploads/2021/08/trtDigital-Logo-Maroc-light_V4.0.svg"
+                            style={{ width: 140, height: 'auto' }}
+                            alt="trtdigital logo"
                         />
                     )}
                 </Link>

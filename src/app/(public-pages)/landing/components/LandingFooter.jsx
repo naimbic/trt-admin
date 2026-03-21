@@ -36,7 +36,7 @@ const LandingFooter = ({ mode }) => {
                             <h2 className="text-5xl">Ready to Get Started?</h2>
                             <p className="mt-4 max-w-[400px] mx-auto">
                                 Build modern, scalable applications effortlessly
-                                with Ecme. Take your project to the next level
+                                with trtdigital. Take your project to the next level
                                 today!
                             </p>
                             <div className="mt-6">
@@ -52,23 +52,21 @@ const LandingFooter = ({ mode }) => {
                         <Link href="/">
                             {mode === MODE_LIGHT && (
                                 <img
-                                    src="/img/logo/logo-light-full.png"
-                                    width={120}
-                                    height={40}
-                                    alt="logo"
+                                    src="https://trtdigital-ma.ams3.digitaloceanspaces.com/wp-content/uploads/2021/08/trtDigital-Logo-Maroc-2.svg"
+                                    style={{ width: 140, height: 'auto' }}
+                                    alt="trtdigital logo"
                                 />
                             )}
                             {mode === MODE_DARK && (
                                 <img
-                                    src="/img/logo/logo-dark-full.png"
-                                    width={120}
-                                    height={40}
-                                    alt="logo"
+                                    src="https://trtdigital-ma.ams3.digitaloceanspaces.com/wp-content/uploads/2021/08/trtDigital-Logo-Maroc-light_V4.0.svg"
+                                    style={{ width: 140, height: 'auto' }}
+                                    alt="trtdigital logo"
                                 />
                             )}
                         </Link>
                         <p className="text-center">
-                            Copyright © {year} Theme_Nate. All rights reserved.
+                            Copyright © {year} trtdigital. All rights reserved.
                         </p>
                     </div>
                 </div>

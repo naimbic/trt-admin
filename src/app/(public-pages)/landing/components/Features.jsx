@@ -188,7 +188,7 @@ const Features = ({ mode, onModeChange, schema, setSchema }) => {
                     viewport={{ once: true }}
                 >
                     <motion.h2 className="my-6 text-5xl">
-                        Discover the Power of Ecme
+                        Discover the Power of trtdigital
                     </motion.h2>
                     <motion.p className="mx-auto max-w-[600px]">
                         Crafted for performance, scalability, and ease of
@@ -296,7 +296,7 @@ const Features = ({ mode, onModeChange, schema, setSchema }) => {
                                                     src="/img/landing/layouts/documentation.png"
                                                     width={630}
                                                     height={562}
-                                                    alt="Ecme documentaion"
+                                                    alt="trtdigital documentation"
                                                 />
                                             )}
                                             {mode === 'dark' && (
@@ -305,7 +305,7 @@ const Features = ({ mode, onModeChange, schema, setSchema }) => {
                                                     src="/img/landing/layouts/documentation-dark.png"
                                                     width={630}
                                                     height={562}
-                                                    alt="Ecme documentaion"
+                                                    alt="trtdigital documentation"
                                                 />
                                             )}
                                         </div>

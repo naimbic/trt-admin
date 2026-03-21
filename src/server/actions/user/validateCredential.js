@@ -14,12 +14,28 @@ const validateCredential = async (values) => {
     const isValid = await bcrypt.compare(password, user.password)
     if (!isValid) return null
 
+    // Build granular authority from role's accessRight
+    const authority = [user.role || 'user']
+    const role = await prisma.role.findUnique({
+        where: { roleId: user.role || 'user' },
+    })
+    if (role?.accessRight) {
+        const ar = typeof role.accessRight === 'string' ? JSON.parse(role.accessRight) : role.accessRight
+        for (const [module, perms] of Object.entries(ar)) {
+            if (Array.isArray(perms)) {
+                for (const perm of perms) {
+                    authority.push(`${module}.${perm}`)
+                }
+            }
+        }
+    }
+
     return {
         id: user.id,
         userName: user.name,
         email: user.email,
         avatar: user.image,
-        authority: user.authority,
+        authority,
     }
 }
 

@@ -1,8 +1,8 @@
 import classNames from 'classnames'
 import { APP_NAME } from '@/constants/app.constant'
-import Image from 'next/image'
 
-const LOGO_SRC_PATH = '/img/logo/'
+const LOGO_LIGHT = 'https://trtdigital-ma.ams3.digitaloceanspaces.com/wp-content/uploads/2021/08/trtDigital-Logo-Maroc-2.svg'
+const LOGO_DARK = 'https://trtdigital-ma.ams3.digitaloceanspaces.com/wp-content/uploads/2021/08/trtDigital-Logo-Maroc-light_V4.0.svg'
 
 const Logo = (props) => {
     const {
@@ -12,68 +12,20 @@ const Logo = (props) => {
         imgClass,
         style,
         logoWidth,
-        logoHeight,
     } = props
 
-    const width = logoWidth || (type === 'full' ? 120 : 40)
-    const height = logoHeight || (type === 'full' ? 40 : 40)
+    const width = logoWidth || (type === 'full' ? 140 : 40)
+    const src = mode === 'dark' ? LOGO_DARK : LOGO_LIGHT
 
     return (
         <div className={classNames('logo', className)} style={style}>
-            {mode === 'light' && (
-                <>
-                    <Image
-                        className={classNames(
-                            '',
-                            type === 'full' ? '' : 'hidden',
-                            imgClass,
-                        )}
-                        src={`${LOGO_SRC_PATH}logo-light-full.png`}
-                        alt={`${APP_NAME} logo`}
-                        width={width}
-                        height={height}
-                        priority
-                    />
-                    <Image
-                        className={classNames(
-                            '',
-                            type === 'streamline' ? '' : 'hidden',
-                            imgClass,
-                        )}
-                        src={`${LOGO_SRC_PATH}logo-light-streamline.png`}
-                        alt={`${APP_NAME} logo`}
-                        width={width}
-                        height={height}
-                        priority
-                    />
-                </>
-            )}
-            {mode === 'dark' && (
-                <>
-                    <Image
-                        className={classNames(
-                            type === 'full' ? '' : 'hidden',
-                            imgClass,
-                        )}
-                        src={`${LOGO_SRC_PATH}logo-dark-full.png`}
-                        alt={`${APP_NAME} logo`}
-                        width={width}
-                        height={height}
-                        priority
-                    />
-                    <Image
-                        className={classNames(
-                            type === 'streamline' ? '' : 'hidden',
-                            imgClass,
-                        )}
-                        src={`${LOGO_SRC_PATH}logo-dark-streamline.png`}
-                        alt={`${APP_NAME} logo`}
-                        width={width}
-                        height={height}
-                        priority
-                    />
-                </>
-            )}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+                className={imgClass}
+                src={src}
+                alt={`${APP_NAME} logo`}
+                style={{ width, height: 'auto' }}
+            />
         </div>
     )
 }

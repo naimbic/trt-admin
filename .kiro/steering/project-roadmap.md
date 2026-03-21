@@ -6,7 +6,7 @@ inclusion: auto
 
 ## Project Context
 - Website: trtmaroc.com (Next.js)
-- Template: Ecme Admin Dashboard v1.2.7
+- Template: trtdigital Admin Dashboard v1.2.7
 - Database: MongoDB with Prisma ORM
 - Goal: Full CRM & Company Management System
 
@@ -42,6 +42,17 @@ inclusion: auto
 - [x] Database Schema Validator (postToolUse on write)
 - [x] Pre-Task DB Consistency Check (preTaskExecution)
 - [x] Prisma Auto Generate (fileEdited on schema.prisma)
+- [x] Task Tracker Update (agentStop) — auto-updates src/data/tasks.json
+- [x] Mock Data Import Detector (fileEdited) — flags mock imports in server actions
+- [x] API Route Validator (postToolUse) — validates API route consistency
+- [x] Environment & DB Connection Check (userTriggered) — manual DB health check
+
+### 1.4 Project Infrastructure ✅
+- [x] Architecture steering doc (.kiro/steering/architecture.md)
+- [x] Coding standards steering doc (.kiro/steering/coding-standards.md)
+- [x] Task tracker (src/data/tasks.json) — 12 tracked tasks across all phases
+- [x] .env + .env.example created with all required variables
+- [x] Fixed Prisma edge runtime error (split auth.config.js for middleware compatibility)
 
 ---
 

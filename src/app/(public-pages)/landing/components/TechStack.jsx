@@ -69,7 +69,7 @@ const TechStack = () => {
                     Core Technologies Powering
                 </motion.h2>
                 <motion.p className="mx-auto max-w-[600px]">
-                    Ecme built using cutting-edge technologies to ensure
+                    trtdigital built using cutting-edge technologies to ensure
                     streamlined, scalability, and a seamless developer
                     experience.
                 </motion.p>

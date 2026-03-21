@@ -6,7 +6,7 @@ const Page = () => {
     return (
         <>
             <p>
-                Ecme provide 6 types of post login layouts & 3 types of auth
+                trtdigital provide 6 types of post login layouts & 3 types of auth
                 layouts, all layouts component can be found under directory{' '}
                 <code>src/components/layouts/PostLoginLayout/components*</code>
                 and all the components used within layouts can be found under{' '}

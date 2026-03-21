@@ -16,9 +16,7 @@ import useSWRMutation from 'swr/mutation'
 const { THead, Th, Tr } = Table
 
 async function getFile(_, { arg }) {
-    const data = await apiGetFiles({
-        id: arg,
-    })
+    const data = await apiGetFiles({ id: arg })
     return data
 }
 
@@ -54,6 +52,10 @@ const FileManager = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    const handleRefresh = () => {
+        trigger(openedDirectoryId)
+    }
+
     const handleShare = (id) => {
         setInviteDialog({ id, open: true })
     }
@@ -62,23 +64,16 @@ const FileManager = () => {
         setDeleteDialog({ id, open: true })
     }
 
-    const handleDownload = () => {
-        const blob = new Blob(
-            [
-                'This text file is created to demonstrate how file downloading works in our template demo.',
-            ],
-            { type: 'text/plain;charset=utf-8' },
-        )
-
+    const handleDownload = (id) => {
+        const file = fileList.find((f) => f.id === id)
+        if (!file || !file.srcUrl) return
         const link = document.createElement('a')
-        link.href = window.URL.createObjectURL(blob)
-        link.download = 'sample-dowoad-file'
+        link.href = file.srcUrl
+        link.download = file.name
+        link.target = '_blank'
         document.body.appendChild(link)
-
         link.click()
-
         document.body.removeChild(link)
-        window.URL.revokeObjectURL(link.href)
     }
 
     const handleRename = (id) => {
@@ -110,6 +105,7 @@ const FileManager = () => {
                 <FileManagerHeader
                     onEntryClick={handleEntryClick}
                     onDirectoryClick={handleDirectoryClick}
+                    onRefresh={handleRefresh}
                 />
                 <div className="mt-6">
                     {isMutating ? (
@@ -158,9 +154,9 @@ const FileManager = () => {
                 </div>
             </div>
             <FileDetails onShare={handleShare} />
-            <FileManagerDeleteDialog />
+            <FileManagerDeleteDialog onDeleted={handleRefresh} />
             <FileManagerInviteDialog />
-            <FileManagerRenameDialog />
+            <FileManagerRenameDialog onRenamed={handleRefresh} />
         </>
     )
 }

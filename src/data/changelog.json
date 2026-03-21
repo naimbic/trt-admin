@@ -1,5 +1,389 @@
 [
   {
+    "version": "1.6.0",
+    "date": "2026-03-21",
+    "type": "update",
+    "message": "Folders now display total size of their contents. Size is calculated server-side by summing all child file sizes in the GET /api/files handler.",
+    "files": [
+      "src/app/api/files/route.js"
+    ]
+  },
+  {
+    "version": "1.5.9",
+    "date": "2026-03-21",
+    "type": "update",
+    "message": "File manager UX: clicking a folder card/row now navigates into it directly instead of opening the details drawer. Image files (jpg, jpeg, png, webp, gif, svg, bmp) show thumbnail previews in both grid and list views. Details drawer image detection expanded to all image types.",
+    "files": [
+      "src/app/(protected-pages)/concepts/file-manager/_components/FileSegment.jsx",
+      "src/app/(protected-pages)/concepts/file-manager/_components/FileRow.jsx",
+      "src/app/(protected-pages)/concepts/file-manager/_components/FileList.jsx",
+      "src/app/(protected-pages)/concepts/file-manager/_components/FileDetails.jsx"
+    ]
+  },
+  {
+    "version": "1.5.8",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Fixed Access Denied for admin role. Admin now treated as superuser in middleware (bypasses granular permission checks) and useAuthority hook (all nav items visible). JWT update trigger now rebuilds full authority array from role accessRight in DB, preventing stale permissions after session refresh.",
+    "files": [
+      "src/middleware.js",
+      "src/utils/hooks/useAuthority.js",
+      "src/auth.js"
+    ]
+  },
+  {
+    "version": "1.5.7",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Fixed profile PUT route missing User.name update. Now builds displayName from firstName+lastName and writes to name field, keeping session/JWT header in sync after profile save. Confirmed MongoDB Atlas cluster back online — all DB-dependent routes operational.",
+    "files": [
+      "src/app/api/setting/profile/route.js"
+    ]
+  },
+  {
+    "version": "1.5.6",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Added loading and error states to SettingsProfile. Form now shows feedback when DB is unreachable instead of blank fields. Added guard against resetting form with error response data.",
+    "files": [
+      "src/app/(protected-pages)/concepts/account/settings/_components/SettingsProfile.jsx"
+    ]
+  },
+  {
+    "version": "1.5.5",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Switched DO Spaces bucket from trtdigital-ma to trt-admin (CDN: trt-admin.ams3.cdn.digitaloceanspaces.com). Fixed integration settings 500 error — replaced createMany with upsert to avoid unique constraint conflicts during default seed. Added file manager seed script (prisma/seed-files.cjs).",
+    "files": [
+      ".env",
+      "src/app/api/setting/intergration/route.js",
+      "prisma/seed-files.cjs"
+    ]
+  },
+  {
+    "version": "1.5.4",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "File Manager wired to DigitalOcean Spaces + Prisma. Upload files to DO Spaces with DB record, create folders, rename, delete (removes from S3 + DB), download via CDN URL. New Folder button added. Expanded upload route to support any file type (not just images) with saveToDb flag.",
+    "files": [
+      "src/app/api/files/route.js",
+      "src/app/api/upload/route.js",
+      "src/services/FileService.js",
+      "src/app/(protected-pages)/concepts/file-manager/_components/FileManager.jsx",
+      "src/app/(protected-pages)/concepts/file-manager/_components/FileManagerHeader.jsx",
+      "src/app/(protected-pages)/concepts/file-manager/_components/UploadFile.jsx",
+      "src/app/(protected-pages)/concepts/file-manager/_components/FileManagerDeleteDialog.jsx",
+      "src/app/(protected-pages)/concepts/file-manager/_components/FileManagerRenameDialog.jsx",
+      "src/app/(protected-pages)/concepts/file-manager/_components/FileList.jsx",
+      "src/app/(protected-pages)/concepts/file-manager/_components/FileDetails.jsx"
+    ]
+  },
+  {
+    "version": "1.5.3",
+    "date": "2026-03-21",
+    "type": "update",
+    "message": "Replaced all logo images with trtdigital SVGs from DO Spaces CDN. Logo component, landing NavigationBar, and LandingFooter now use external SVG URLs with dark/light mode support.",
+    "files": [
+      "src/components/template/Logo.jsx",
+      "src/app/(public-pages)/landing/components/NavigationBar.jsx",
+      "src/app/(public-pages)/landing/components/LandingFooter.jsx"
+    ]
+  },
+  {
+    "version": "1.5.2",
+    "date": "2026-03-21",
+    "type": "update",
+    "message": "Rebranded app from Ecme to trtdigital. Updated APP_NAME, page meta title, package.json name, copyright notices, landing page components, auth layout, all documentation pages, pricing FAQ email, and README.",
+    "files": [
+      "src/constants/app.constant.js",
+      "src/configs/page-meta.config.js",
+      "package.json",
+      "README.md",
+      "src/components/layouts/AuthLayout/Split.jsx",
+      "src/app/(public-pages)/landing/components/LandingFooter.jsx",
+      "src/app/(public-pages)/landing/components/TechStack.jsx",
+      "src/app/(public-pages)/landing/components/Demos.jsx",
+      "src/app/(public-pages)/landing/components/Features.jsx",
+      "src/app/(public-pages)/landing/components/HeroContent.jsx",
+      "src/app/(protected-pages)/concepts/account/pricing/constants.js"
+    ]
+  },
+  {
+    "version": "1.5.1",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Fixed profile PUT route not updating User.name field. Now builds displayName from firstName+lastName and writes to name, ensuring the session/JWT and header avatar stay in sync after profile save.",
+    "files": [
+      "src/app/api/setting/profile/route.js"
+    ]
+  },
+  {
+    "version": "1.5.0",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Role-based access control (RBAC) fully wired. Login now builds granular authority array from role accessRight (e.g. users.read, products.write). Navigation menu items and route configs use granular permissions to control visibility. Middleware RBAC enabled with dynamic route matching. Mapping: users→Customers, products→Products/Orders, configurations→AI/Roles, files→File Manager, reports→Dashboards/Help Center.",
+    "files": [
+      "src/constants/roles.constant.js",
+      "src/server/actions/user/validateCredential.js",
+      "src/configs/navigation.config/concepts.navigation.config.js",
+      "src/configs/navigation.config/dashboards.navigation.config.js",
+      "src/configs/routes.config/conceptsRoute.js",
+      "src/configs/routes.config/dashboardsRoute.js",
+      "src/middleware.js"
+    ]
+  },
+  {
+    "version": "1.4.9",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Fixed permission toggles not working when creating a new role. Segment value was reading from undefined (no selected role in create mode) and handleChange mutated state in place without triggering re-render. Now reads from local accessRight state for new roles and returns a new object reference on change.",
+    "files": [
+      "src/app/(protected-pages)/concepts/account/roles-permissions/_components/RolesPermissionsAccessDialog.jsx"
+    ]
+  },
+  {
+    "version": "1.4.8",
+    "date": "2026-03-21",
+    "type": "update",
+    "message": "Enhanced Roles & Permissions user management. Add User dialog now includes phone, title/position, role (dynamic from DB), and status fields. User table has per-row actions: status toggle (active/blocked) and individual delete with confirmation. Role cards have delete button (protected for admin role). Role edit dialog includes delete option in footer.",
+    "files": [
+      "src/app/(protected-pages)/concepts/account/roles-permissions/_components/RolesPermissionsGroupsAction.jsx",
+      "src/app/(protected-pages)/concepts/account/roles-permissions/_components/RolesPermissionsUserTable.jsx",
+      "src/app/(protected-pages)/concepts/account/roles-permissions/_components/RolesPermissionsGroups.jsx",
+      "src/app/(protected-pages)/concepts/account/roles-permissions/_components/RolesPermissionsAccessDialog.jsx",
+      "src/app/api/roles/users/route.js"
+    ]
+  },
+  {
+    "version": "1.4.7",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Roles & Permissions fully wired to MongoDB. Added Role Prisma model with auto-seed (6 default roles). Users table reads from DB with filtering, pagination, and sorting. Role assignment, user creation (with bcrypt), bulk deletion, and role CRUD all persist to DB. Add User dialog with name/email/password/role fields. getRolesPermissionsRoles and getRolesPermissionsUsers server actions now use Prisma.",
+    "files": [
+      "prisma/schema.prisma",
+      "src/app/api/roles/route.js",
+      "src/app/api/roles/users/route.js",
+      "src/server/actions/getRolesPermissionsRoles.js",
+      "src/server/actions/getRolesPermissionsUsers.js",
+      "src/services/AccontsService.js",
+      "src/app/(protected-pages)/concepts/account/roles-permissions/_components/RolesPermissionsGroupsAction.jsx",
+      "src/app/(protected-pages)/concepts/account/roles-permissions/_components/RolesPermissionsUserTable.jsx",
+      "src/app/(protected-pages)/concepts/account/roles-permissions/_components/RolesPermissionsUserSelected.jsx",
+      "src/app/(protected-pages)/concepts/account/roles-permissions/_components/RolesPermissionsAccessDialog.jsx"
+    ]
+  },
+  {
+    "version": "1.4.6",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Pricing plans editable from DB. Added PricingPlan Prisma model with auto-seed. Admin can edit plan name, description, and monthly/annual prices via inline dialog. Payment flow wired to DB: subscribing saves credit card, updates user plan, and creates transaction record. Billing settings reflects live subscription data. getPricingPlans server action now reads from Prisma instead of mock data.",
+    "files": [
+      "prisma/schema.prisma",
+      "src/app/api/pricing/route.js",
+      "src/server/actions/getPricingPlans.js",
+      "src/services/AccontsService.js",
+      "src/app/(protected-pages)/concepts/account/pricing/_components/Plans.jsx",
+      "src/app/(protected-pages)/concepts/account/pricing/_components/PaymentDialog.jsx",
+      "src/app/(protected-pages)/concepts/account/settings/_components/SettingsBilling.jsx"
+    ]
+  },
+  {
+    "version": "1.4.5",
+    "date": "2026-03-21",
+    "type": "update",
+    "message": "Session review: marked TASK-010 (file upload integration) as done — avatar upload to DO Spaces with WebP conversion, sharp resizing, and CDN caching fully implemented. Updated task file paths to reflect actual route.",
+    "files": [
+      "src/data/tasks.json",
+      "src/data/changelog.json"
+    ]
+  },
+  {
+    "version": "1.4.4",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Replaced unreliable NextAuth updateSession() with zustand store for live header profile sync. SettingsProfile writes name/image/email to useProfileStore after save, UserProfileDropdown reads from store as override. Instant re-render, no session refresh dependency.",
+    "files": [
+      "src/utils/hooks/useProfileStore.js",
+      "src/components/template/UserProfileDropdown.jsx",
+      "src/app/(protected-pages)/concepts/account/settings/_components/SettingsProfile.jsx"
+    ]
+  },
+  {
+    "version": "1.4.3",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "UserProfileDropdown now uses useSession() directly from next-auth instead of custom SessionContext, ensuring header avatar and name update live after profile save. Changelog page wired to read from src/data/changelog.json instead of hardcoded data.",
+    "files": [
+      "src/components/template/UserProfileDropdown.jsx",
+      "src/app/(protected-pages)/guide/changelog/page.jsx"
+    ]
+  },
+  {
+    "version": "1.4.2",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Fixed header avatar/name not updating after profile save. Root cause: PUT /api/setting/profile was saving firstName/lastName but never updating the User.name field that the session reads. Now builds displayName from firstName+lastName and writes it to name. Cleared .next cache.",
+    "files": [
+      "src/app/api/setting/profile/route.js"
+    ]
+  },
+  {
+    "version": "1.4.1",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Live session sync for avatar and profile changes. After saving profile, the top-right header avatar and name update instantly via NextAuth session refresh. JWT callback re-fetches user data from DB on update trigger. AuthProvider now bridges NextAuth live session into custom SessionContext.",
+    "files": [
+      "src/auth.js",
+      "src/configs/auth.config.js",
+      "src/components/auth/AuthProvider/AuthProvider.jsx",
+      "src/app/(protected-pages)/concepts/account/settings/_components/SettingsProfile.jsx"
+    ]
+  },
+  {
+    "version": "1.4.0",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Image optimization pipeline: upload route now converts all images to WebP via sharp before uploading to DO Spaces. Auto-resizes per folder (avatars 256x256, products 800x800, default 1200x1200), configurable quality, immutable CDN caching. Returns compression stats.",
+    "files": [
+      "src/app/api/upload/route.js",
+      "package.json"
+    ]
+  },
+  {
+    "version": "1.3.9",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Avatar upload to DigitalOcean Spaces. Profile image now uploads to S3-compatible CDN (trtdigital-ma/ams3) instead of using temporary blob URLs. Added upload API endpoint, S3 client lib, and wired profile component. Supports JPEG, PNG, WebP, AVIF up to 5MB.",
+    "files": [
+      "src/lib/spaces.js",
+      "src/app/api/upload/route.js",
+      "src/app/(protected-pages)/concepts/account/settings/_components/SettingsProfile.jsx",
+      ".env",
+      ".env.example"
+    ]
+  },
+  {
+    "version": "1.3.8",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Cleared stale Turbopack cache (.next) that was serving the old profile route without PUT handler, causing persistent 405 errors despite correct file on disk. Requires dev server restart.",
+    "files": [".next"]
+  },
+  {
+    "version": "1.3.7",
+    "date": "2026-03-21",
+    "type": "update",
+    "message": "Added full settings reference doc (.kiro/steering/settings-reference.md) covering all 5 tabs, fields, DB mappings, API routes, response shapes, and known limitations. Fixed persistent profile route disk-sync issue via direct write.",
+    "files": [
+      ".kiro/steering/settings-reference.md",
+      "src/app/api/setting/profile/route.js"
+    ]
+  },
+  {
+    "version": "1.3.6",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Fixed settings page runtime errors: profile route was still serving old mock code (405 on PUT), Zod validation blocked submission for fresh users with empty fields (made all fields except email optional), integration update used invalid Prisma where clause (switched to updateMany), added toast feedback on profile save.",
+    "files": [
+      "src/app/api/setting/profile/route.js",
+      "src/app/api/setting/intergration/route.js",
+      "src/app/(protected-pages)/concepts/account/settings/_components/SettingsProfile.jsx"
+    ]
+  },
+  {
+    "version": "1.3.5",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Fixed 405 Method Not Allowed on profile settings save. The profile API route file failed to write during initial deployment and was still serving the old mock-only GET handler. Rewrote with proper GET + PUT Prisma handlers.",
+    "files": [
+      "src/app/api/setting/profile/route.js"
+    ]
+  },
+  {
+    "version": "1.3.4",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Settings page fully wired to MongoDB via Prisma. All 5 tabs (profile, security, notification, billing, integration) now read from and save to the database. Replaced all mock data imports with Prisma queries. Added PUT endpoints for profile, notification, billing (plan + payment methods), integration toggles, and password change with bcrypt verification.",
+    "files": [
+      "src/app/api/setting/profile/route.js",
+      "src/app/api/setting/notification/route.js",
+      "src/app/api/setting/billing/route.js",
+      "src/app/api/setting/intergration/route.js",
+      "src/app/api/setting/password/route.js",
+      "src/services/AccontsService.js",
+      "src/app/(protected-pages)/concepts/account/settings/_components/SettingsProfile.jsx",
+      "src/app/(protected-pages)/concepts/account/settings/_components/SettingsSecurity.jsx",
+      "src/app/(protected-pages)/concepts/account/settings/_components/SettingsNotification.jsx",
+      "src/app/(protected-pages)/concepts/account/settings/_components/SettingsBilling.jsx",
+      "src/app/(protected-pages)/concepts/account/settings/_components/SettingIntegration.jsx"
+    ]
+  },
+  {
+    "version": "1.3.3",
+    "date": "2026-03-21",
+    "type": "update",
+    "message": "Session audit: reviewed settings page status. All 4 settings tabs (profile, notification, billing, integration) still use mock data from accountsData.js via API routes. No Prisma model for user settings exists yet. No database persistence for settings fields. Settings page work not started — needs Prisma model, API route rewrites, and form save handlers.",
+    "files": [
+      "src/app/api/setting/profile/route.js",
+      "src/app/api/setting/notification/route.js",
+      "src/app/api/setting/billing/route.js",
+      "src/app/api/setting/intergration/route.js",
+      "src/app/(protected-pages)/concepts/account/settings/_components/SettingsProfile.jsx",
+      "src/services/AccontsService.js"
+    ]
+  },
+  {
+    "version": "1.3.2",
+    "date": "2026-03-21",
+    "type": "update",
+    "message": "Removed hardcoded admin credentials. Seed script now reads ADMIN_NAME, ADMIN_EMAIL, ADMIN_PASSWORD from env vars. Cleared pre-filled demo creds from sign-in form and mock data. Updated docs and .env.example.",
+    "files": [
+      "prisma/seed.js",
+      "src/components/auth/SignIn/SignInForm.jsx",
+      "src/mock/data/authData.js",
+      "src/app/(protected-pages)/guide/documentation/starter/page.jsx",
+      ".env",
+      ".env.example"
+    ]
+  },
+  {
+    "version": "1.3.1",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Downgraded Prisma from v7 to v6 (6.19.2) — Prisma 7 does not yet support MongoDB. Removed prisma.config.ts (v7-only). App now starts cleanly on dev server.",
+    "files": ["package.json", "package-lock.json", "prisma.config.ts"]
+  },
+  {
+    "version": "1.3.0",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Project infrastructure & AI agent system: added architecture and coding standards steering docs, task tracker (12 tasks), 4 new agent hooks (env-check, task-tracker, mock-data-detector, api-route-validator), .env setup, and updated project roadmap.",
+    "files": [
+      ".kiro/steering/architecture.md",
+      ".kiro/steering/coding-standards.md",
+      ".kiro/steering/project-roadmap.md",
+      ".kiro/hooks/env-check-on-start.kiro.hook",
+      ".kiro/hooks/task-tracker-update.kiro.hook",
+      ".kiro/hooks/mock-data-detector.kiro.hook",
+      ".kiro/hooks/api-route-validator.kiro.hook",
+      "src/data/tasks.json"
+    ]
+  },
+  {
+    "version": "1.2.9",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Fixed Prisma edge runtime error in middleware by splitting auth config. Moved Credentials provider with Prisma dependency into server-side auth.js, keeping auth.config.js edge-compatible.",
+    "files": ["src/auth.js", "src/configs/auth.config.js"]
+  },
+  {
+    "version": "1.2.8",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Resolved production start error due to missing .next build directory. No code changes; dependency lock updated.",
+    "files": ["package-lock.json"]
+  },
+  {
     "version": "1.2.7",
     "date": "2026-03-20",
     "type": "feature",

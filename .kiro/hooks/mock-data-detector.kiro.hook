@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "name": "Mock Data Import Detector",
+  "description": "When any server action or API route is edited, check if it still imports from mock data and flag it for migration to Prisma.",
+  "version": "1.0.0",
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["src/server/actions/**/*.js", "src/server/actions/**/*.jsx", "src/app/api/**/*.js"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Check if the file that was just edited imports from '@/mock/' or 'src/mock/'. If it does, flag it and suggest replacing the mock import with a Prisma query using '@/lib/prisma'. Reference the schema in prisma/schema.prisma for correct model and field names. Do NOT auto-fix — just report what needs to change."
+  }
+}

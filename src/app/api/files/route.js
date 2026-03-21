@@ -1,61 +1,194 @@
 import { NextResponse } from 'next/server'
-import { fileListData } from '@/mock/data/filesData'
+import { auth } from '@/auth'
+import prisma from '@/lib/prisma'
+import { DeleteObjectCommand } from '@aws-sdk/client-s3'
+import spaces, { BUCKET } from '@/lib/spaces'
 
 export async function GET(request) {
-    const searchParams = request.nextUrl.searchParams
-    const id = searchParams.get('id')
-
-    const directoryList = fileListData.filter(
-        (file) => file.fileType === 'directory',
-    )
-    const directoryIdList = directoryList.map((directory) => directory.id)
-
     try {
-        let list = fileListData
-        let filesIncluded = []
+        const session = await auth()
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        const searchParams = request.nextUrl.searchParams
+        const folder = searchParams.get('id') || ''
+
+        const files = await prisma.file.findMany({
+            where: { folder: folder || null },
+            orderBy: { createdAt: 'desc' },
+        })
+
+        const user = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: { name: true, email: true, image: true },
+        })
+
+        const list = await Promise.all(files.map(async (f) => {
+            let size = f.size || 0
+            // For directories, sum the sizes of all children
+            if (f.fileType === 'directory') {
+                const children = await prisma.file.findMany({
+                    where: { folder: f.id },
+                    select: { size: true },
+                })
+                size = children.reduce((sum, c) => sum + (c.size || 0), 0)
+            }
+            return {
+                id: f.id,
+                name: f.name,
+                fileType: f.fileType,
+                srcUrl: f.url || '',
+                size,
+                author: {
+                    name: user?.name || 'Unknown',
+                    email: user?.email || '',
+                    img: user?.image || '',
+                },
+                activities: [
+                    {
+                        userName: user?.name || 'Unknown',
+                        userImg: user?.image || '',
+                        actionType: 'CREATE',
+                        timestamp: Math.floor(f.createdAt.getTime() / 1000),
+                    },
+                ],
+                permissions: [
+                    {
+                        userName: user?.name || 'Unknown',
+                        userImg: user?.image || '',
+                        role: 'owner',
+                    },
+                ],
+                uploadDate: Math.floor(f.createdAt.getTime() / 1000),
+                recent: true,
+            }
+        }))
+
+        // Build directory breadcrumb
         let directory = []
-
-        if (directoryList.some((directory) => directory.id === id)) {
-            switch (id) {
-                case '6':
-                    filesIncluded = ['2', '7', '8', '9', '15', '16']
-                    break
-                case '12':
-                    filesIncluded = ['1', '2', '5']
-                    break
-                case '18':
-                    filesIncluded = ['11', '13', '7', '4']
-                    break
-                case '19':
-                    filesIncluded = ['15', '17', '3', '8', '7']
-                    break
-                case '20':
-                    filesIncluded = ['3', '4', '10', '14']
-                    break
-                default:
-                    break
-            }
+        if (folder) {
+            directory = [{ id: folder, label: folder }]
         }
 
-        if (filesIncluded.length > 0) {
-            list = fileListData.filter((file) =>
-                filesIncluded.includes(file.id),
-            )
-            const dir = fileListData.find((file) => file.id === id)
-
-            if (dir && directoryIdList.includes(id)) {
-                directory = [{ id: dir.id, label: dir.name }]
-            }
-        }
-
-        const resp = {
-            list,
-            directory: directory,
-        }
-
-        return NextResponse.json(resp)
+        return NextResponse.json({ list, directory })
     } catch (error) {
-        console.log(error)
-        return NextResponse.json({ error: error }, { status: 500 })
+        console.error('GET /api/files error:', error)
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+}
+
+export async function POST(request) {
+    try {
+        const session = await auth()
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        const body = await request.json()
+        const { action } = body
+
+        if (action === 'createFolder') {
+            const file = await prisma.file.create({
+                data: {
+                    name: body.name || 'New Folder',
+                    fileType: 'directory',
+                    size: 0,
+                    url: '',
+                    folder: body.folder || null,
+                    uploadedBy: session.user.id,
+                },
+            })
+            return NextResponse.json({ success: true, id: file.id })
+        }
+
+        return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
+    } catch (error) {
+        console.error('POST /api/files error:', error)
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+}
+
+export async function PUT(request) {
+    try {
+        const session = await auth()
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        const body = await request.json()
+        const { id, name } = body
+
+        if (!id || !name) {
+            return NextResponse.json({ error: 'Missing id or name' }, { status: 400 })
+        }
+
+        await prisma.file.update({
+            where: { id },
+            data: { name },
+        })
+
+        return NextResponse.json({ success: true })
+    } catch (error) {
+        console.error('PUT /api/files error:', error)
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+}
+
+export async function DELETE(request) {
+    try {
+        const session = await auth()
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        const { searchParams } = new URL(request.url)
+        const id = searchParams.get('id')
+
+        if (!id) {
+            return NextResponse.json({ error: 'Missing id' }, { status: 400 })
+        }
+
+        const file = await prisma.file.findUnique({ where: { id } })
+        if (!file) {
+            return NextResponse.json({ error: 'File not found' }, { status: 404 })
+        }
+
+        // Delete from DO Spaces if it has a URL (not a folder)
+        if (file.url && file.fileType !== 'directory') {
+            try {
+                const key = file.url.split('.cdn.digitaloceanspaces.com/')[1]
+                if (key) {
+                    await spaces.send(new DeleteObjectCommand({ Bucket: BUCKET, Key: key }))
+                }
+            } catch (e) {
+                console.error('S3 delete error (non-fatal):', e)
+            }
+        }
+
+        // If directory, delete children too
+        if (file.fileType === 'directory') {
+            const children = await prisma.file.findMany({ where: { folder: id } })
+            for (const child of children) {
+                if (child.url && child.fileType !== 'directory') {
+                    try {
+                        const key = child.url.split('.cdn.digitaloceanspaces.com/')[1]
+                        if (key) {
+                            await spaces.send(new DeleteObjectCommand({ Bucket: BUCKET, Key: key }))
+                        }
+                    } catch (e) {
+                        console.error('S3 child delete error (non-fatal):', e)
+                    }
+                }
+            }
+            await prisma.file.deleteMany({ where: { folder: id } })
+        }
+
+        await prisma.file.delete({ where: { id } })
+
+        return NextResponse.json({ success: true })
+    } catch (error) {
+        console.error('DELETE /api/files error:', error)
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
 }

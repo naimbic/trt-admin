@@ -8,7 +8,18 @@ import FileIcon from '@/components/view/FileIcon'
 const { Tr, Td } = Table
 
 const FileRow = (props) => {
-    const { fileType, size, name, onClick, ...rest } = props
+    const { fileType, size, name, srcUrl, onClick, onOpen, ...rest } = props
+
+    const isImage = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'bmp'].includes(fileType)
+    const isFolder = fileType === 'directory'
+
+    const handleClick = () => {
+        if (isFolder && onOpen) {
+            onOpen()
+        } else {
+            onClick?.()
+        }
+    }
 
     return (
         <Tr>
@@ -16,11 +27,19 @@ const FileRow = (props) => {
                 <div
                     className="inline-flex items-center gap-2 cursor-pointer group"
                     role="button"
-                    onClick={onClick}
+                    onClick={handleClick}
                 >
-                    <div className="text-3xl">
-                        <FileIcon type={fileType || ''} />
-                    </div>
+                    {isImage && srcUrl ? (
+                        <img
+                            src={srcUrl}
+                            alt={name}
+                            className="w-8 h-8 rounded object-cover"
+                        />
+                    ) : (
+                        <div className="text-3xl">
+                            <FileIcon type={fileType || ''} />
+                        </div>
+                    )}
                     <div className="font-bold heading-text group-hover:text-primary">
                         {name}
                     </div>
@@ -32,7 +51,7 @@ const FileRow = (props) => {
             </Td>
             <Td>
                 <div className="flex justify-end">
-                    <FileItemDropdown {...rest} />
+                    <FileItemDropdown onOpen={onOpen} {...rest} />
                 </div>
             </Td>
         </Tr>

@@ -15,7 +15,7 @@ const Page = () => {
             <p>
                 In this section, we&apos;ll explore how APIs work in Next.js,
                 provide examples of creating API routes, and demonstrate how it
-                work with Ecme.
+                work with trtdigital.
             </p>
             <div className="mt-10" id="howApiRoutesWork">
                 <h5>How API Routes Work</h5>

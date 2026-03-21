@@ -34,8 +34,9 @@ const FileList = (props) => {
                     fileType={file.fileType}
                     size={file.size}
                     name={file.name}
+                    srcUrl={file.srcUrl}
                     onClick={() => onClick(file.id)}
-                    onDownload={onDownload}
+                    onDownload={() => onDownload(file.id)}
                     onShare={() => onShare(file.id)}
                     onDelete={() => onDelete(file.id)}
                     onRename={() => onRename(file.id)}
@@ -62,8 +63,9 @@ const FileList = (props) => {
                         fileType={file.fileType}
                         size={file.size}
                         name={file.name}
+                        srcUrl={file.srcUrl}
                         onClick={() => onClick(file.id)}
-                        onDownload={onDownload}
+                        onDownload={() => onDownload(file.id)}
                         onShare={() => onShare(file.id)}
                         onDelete={() => onDelete(file.id)}
                         onRename={() => onRename(file.id)}

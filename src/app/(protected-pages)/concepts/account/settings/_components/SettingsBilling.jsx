@@ -7,10 +7,9 @@ import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import CreditCardDialog from '@/components/view/CreditCardDialog'
 import BillingHistory from './BillingHistory'
-import { apiGetSettingsBilling } from '@/services/AccontsService'
+import { apiGetSettingsBilling, apiPutSettingsBilling } from '@/services/AccontsService'
 import classNames from '@/utils/classNames'
 import isLastChild from '@/utils/isLastChild'
-import sleep from '@/utils/sleep'
 import { TbPlus } from 'react-icons/tb'
 import useSWR from 'swr'
 import dayjs from 'dayjs'
@@ -54,6 +53,7 @@ const SettingsBilling = () => {
             paymentMethods: [],
             transactionHistory: [],
         },
+        mutate,
     } = useSWR('/api/settings/billing/', () => apiGetSettingsBilling(), {
         revalidateOnFocus: false,
         revalidateIfStale: false,
@@ -76,9 +76,14 @@ const SettingsBilling = () => {
         })
     }
 
-    const handleEditCreditCardSubmit = async () => {
-        await sleep(500)
+    const handleEditCreditCardSubmit = async (values) => {
+        await apiPutSettingsBilling({
+            action: 'editPaymentMethod',
+            cardId: selectedCard.cardInfo.cardId,
+            ...values,
+        })
         handleCreditCardDialogClose()
+        mutate()
         toast.push(
             <Notification type="success">Credit card updated!</Notification>,
             { placement: 'top-center' },
@@ -86,9 +91,12 @@ const SettingsBilling = () => {
     }
 
     const handleAddCreditCardSubmit = async (values) => {
-        console.log('Submitted values', values)
-        await sleep(500)
+        await apiPutSettingsBilling({
+            action: 'addPaymentMethod',
+            ...values,
+        })
         handleCreditCardDialogClose()
+        mutate()
         toast.push(
             <Notification type="success">Credit card added!</Notification>,
             { placement: 'top-center' },
@@ -96,7 +104,10 @@ const SettingsBilling = () => {
     }
 
     const handleChangePlan = () => {
-        router.push('/concepts/account/pricing?subcription=basic&cycle=monthly')
+        const planId = (data.currentPlan.plan || '').toLowerCase().split(' ')[0]
+        router.push(
+            `/concepts/account/pricing?subcription=${planId}&cycle=${data.currentPlan.billingCycle || 'monthly'}`,
+        )
     }
 
     return (

@@ -2,7 +2,7 @@
 import Checkbox from '@/components/ui/Checkbox'
 import Radio from '@/components/ui/Radio'
 import Switcher from '@/components/ui/Switcher'
-import { apiGetSettingsNotification } from '@/services/AccontsService'
+import { apiGetSettingsNotification, apiPutSettingsNotification } from '@/services/AccontsService'
 import useSWR from 'swr'
 import cloneDeep from 'lodash/cloneDeep'
 import { TbMessageCircleCheck } from 'react-icons/tb'
@@ -67,10 +67,15 @@ const SettingsNotification = () => {
         },
     )
 
+    const saveNotification = (newData) => {
+        mutate(newData, false)
+        apiPutSettingsNotification(newData)
+    }
+
     const handleEmailNotificationOptionChange = (values) => {
         const newData = cloneDeep(data)
         newData.email = values
-        mutate(newData, false)
+        saveNotification(newData)
     }
 
     const handleEmailNotificationOptionCheckAll = (value) => {
@@ -86,25 +91,25 @@ const SettingsNotification = () => {
             newData.email = []
         }
 
-        mutate(newData, false)
+        saveNotification(newData)
     }
 
     const handleDesktopNotificationCheck = (value) => {
         const newData = cloneDeep(data)
         newData.desktop = value
-        mutate(newData, false)
+        saveNotification(newData)
     }
 
     const handleUnreadMessagebadgeCheck = (value) => {
         const newData = cloneDeep(data)
         newData.unreadMessageBadge = value
-        mutate(newData, false)
+        saveNotification(newData)
     }
 
     const handleNotifyMeChange = (value) => {
         const newData = cloneDeep(data)
         newData.notifymeAbout = value
-        mutate(newData, false)
+        saveNotification(newData)
     }
 
     return (

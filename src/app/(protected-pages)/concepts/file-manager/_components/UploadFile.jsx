@@ -7,26 +7,57 @@ import Upload from '@/components/ui/Upload'
 import toast from '@/components/ui/toast'
 import Notification from '@/components/ui/Notification'
 import UploadMedia from '@/assets/svg/UploadMedia'
-import sleep from '@/utils/sleep'
+import { useFileManagerStore } from '../_store/useFileManagerStore'
 
-const UploadFile = () => {
+const UploadFile = ({ onUploaded }) => {
     const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
     const [isUploading, setIsUploading] = useState(false)
-    const [uploadedFiles, setUploadedFiles] = useState([])
+    const [pendingFiles, setPendingFiles] = useState([])
+    const { openedDirectoryId } = useFileManagerStore()
 
     const handleUploadDialogClose = () => {
         setUploadDialogOpen(false)
+        setPendingFiles([])
     }
 
     const handleUpload = async () => {
+        if (pendingFiles.length === 0) return
         setIsUploading(true)
-        await sleep(500)
-        handleUploadDialogClose()
-        setIsUploading(false)
-        toast.push(
-            <Notification title={'Successfully uploaded'} type="success" />,
-            { placement: 'top-center' },
-        )
+
+        try {
+            for (const file of pendingFiles) {
+                const form = new FormData()
+                form.append('file', file)
+                form.append('folder', 'files')
+                form.append('saveToDb', 'true')
+                if (openedDirectoryId) {
+                    form.append('parentFolder', openedDirectoryId)
+                }
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: form,
+                })
+                const json = await res.json()
+                if (!json.success) {
+                    throw new Error(json.error || 'Upload failed')
+                }
+            }
+            handleUploadDialogClose()
+            toast.push(
+                <Notification title="Upload complete" type="success" />,
+                { placement: 'top-center' },
+            )
+            onUploaded?.()
+        } catch (err) {
+            toast.push(
+                <Notification title="Upload failed" type="danger">
+                    {err.message}
+                </Notification>,
+                { placement: 'top-center' },
+            )
+        } finally {
+            setIsUploading(false)
+        }
     }
 
     return (
@@ -42,9 +73,10 @@ const UploadFile = () => {
                 <h4>Upload Files</h4>
                 <Upload
                     draggable
+                    multiple
                     className="mt-6 bg-gray-100 dark:bg-transparent"
-                    onChange={setUploadedFiles}
-                    onFileRemove={setUploadedFiles}
+                    onChange={setPendingFiles}
+                    onFileRemove={setPendingFiles}
                 >
                     <div className="my-4 text-center">
                         <div className="text-6xl mb-4 flex justify-center">
@@ -57,7 +89,7 @@ const UploadFile = () => {
                             <span className="text-blue-500">browse</span>
                         </p>
                         <p className="mt-1 font-semibold opacity-60 dark:text-white">
-                            through your machine
+                            Max 10MB per file
                         </p>
                     </div>
                 </Upload>
@@ -66,10 +98,10 @@ const UploadFile = () => {
                         block
                         loading={isUploading}
                         variant="solid"
-                        disabled={uploadedFiles.length === 0}
+                        disabled={pendingFiles.length === 0}
                         onClick={handleUpload}
                     >
-                        Upload
+                        Upload {pendingFiles.length > 0 ? `(${pendingFiles.length})` : ''}
                     </Button>
                 </div>
             </Dialog>

@@ -1,8 +1,8 @@
-# Ecme - The Ultimate Next.js & TypeScript Web Template
+# trtdigital - CRM & Company Management System
 
-Ecme is a modern and responsive admin dashboard template built with Next.js and TypeScript. Designed to provide a highly customizable and easy-to-use platform for building admin interfaces, it includes a variety of reusable components, pre-designed pages, and dynamic features. 
+trtdigital is a modern and responsive admin dashboard template built with Next.js and TypeScript. Designed to provide a highly customizable and easy-to-use platform for building admin interfaces, it includes a variety of reusable components, pre-designed pages, and dynamic features. 
 
-This template is perfect for developing dashboards, web applications, CRM systems, e-commerce backends, and more. Whether you're building a small-scale admin panel or a large-scale enterprise application, Ecme is designed to be flexible and scalable.
+This template is perfect for developing dashboards, web applications, CRM systems, e-commerce backends, and more. Whether you're building a small-scale admin panel or a large-scale enterprise application, trtdigital is designed to be flexible and scalable.
 
 Key Features:
 - **Next.js Framework**: Built with the powerful Next.js framework, offering server-side rendering (SSR) out of the box.
@@ -16,9 +16,9 @@ Key Features:
 
 ---
 ### Demo
-Check out the [Live Demo](https://ecme-react.themenate.net/) to explore the template in action.
+Check out the live app at [trtmaroc.com](https://trtmaroc.com).
 
 
 ### Guide
-Please visit our [Online documentation](https://ecme-react.themenate.net/guide/documentation/introduction) for detailed guides, setup instructions, and customization options.
+See the in-app documentation at `/guide/documentation/introduction` for setup instructions and customization options.
 

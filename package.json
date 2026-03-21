@@ -1,5 +1,5 @@
 {
-  "name": "ecme-next",
+  "name": "trtdigital",
   "version": "1.2.7",
   "private": true,
   "type": "module",
@@ -19,6 +19,7 @@
     "postinstall": "npx prisma generate"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1014.0",
     "@floating-ui/react": "^0.27.16",
     "@fullcalendar/core": "^6.1.18",
     "@fullcalendar/daygrid": "^6.1.18",
@@ -27,7 +28,7 @@
     "@fullcalendar/timegrid": "^6.1.18",
     "@hello-pangea/dnd": "^18.0.1",
     "@hookform/resolvers": "^5.2.1",
-    "@prisma/client": "^7.5.0",
+    "@prisma/client": "^6.9.0",
     "@tanstack/match-sorter-utils": "^8.19.4",
     "@tanstack/react-table": "^8.20.5",
     "@tanstack/react-virtual": "^3.11.2",
@@ -50,7 +51,7 @@
     "next": "^16.2.1",
     "next-auth": "^5.0.0-beta.25",
     "next-intl": "^4.7.0",
-    "prisma": "^7.5.0",
+    "prisma": "^6.9.0",
     "react": "19.2.3",
     "react-apexcharts": "^1.7.0",
     "react-csv": "^2.2.2",
@@ -66,6 +67,7 @@
     "react-simple-maps": "4.0.0-beta.6",
     "react-syntax-highlighter": "^15.6.1",
     "react-tooltip": "^5.28.0",
+    "sharp": "^0.34.5",
     "simplebar-react": "^3.3.0",
     "swr": "^2.3.0",
     "tailwind-merge": "^3.3.1",

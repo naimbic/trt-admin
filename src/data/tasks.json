@@ -1,0 +1,231 @@
+[
+  {
+    "id": "TASK-001",
+    "title": "Wire remaining dashboard server actions to Prisma",
+    "description": "getEcommerceDashboard, getProjectDashboard, getMarketingDashboard, getAnalyticDashboard still import from mock data. Replace with real Prisma aggregation queries.",
+    "status": "todo",
+    "priority": "critical",
+    "phase": 2,
+    "files": [
+      "src/server/actions/getEcommerceDashboard.js",
+      "src/server/actions/getProjectDashboard.js",
+      "src/server/actions/getMarketingDashboard.js",
+      "src/server/actions/getAnalyticDashboard.js"
+    ]
+  },
+  {
+    "id": "TASK-002",
+    "title": "Wire chat, mail, calendar, scrumboard to Prisma",
+    "description": "getChatList, getChatHistory, getMail, getMailList, getCalendar, getScrumboardData still use mock data.",
+    "status": "todo",
+    "priority": "high",
+    "phase": 2,
+    "files": [
+      "src/server/actions/getChatList.js",
+      "src/server/actions/getChatHistory.js",
+      "src/server/actions/getMail.js",
+      "src/server/actions/getMailList.js",
+      "src/server/actions/getCalendar.js",
+      "src/server/actions/getScrumboardData.js",
+      "src/server/actions/getSrcumboardMembers.js"
+    ]
+  },
+  {
+    "id": "TASK-003",
+    "title": "Wire help center & RBAC to Prisma",
+    "description": "getPricingPlans, getRolesPermissionsRoles, getRolesPermissionsUsers done. Remaining: getManageArticle, getArticle still use mock data.",
+    "status": "in-progress",
+    "priority": "high",
+    "phase": 2,
+    "files": [
+      "src/server/actions/getManageArticle.js",
+      "src/server/actions/getArticle.js",
+      "src/server/actions/getPricingPlans.js",
+      "src/server/actions/getRolesPermissionsRoles.js",
+      "src/server/actions/getRolesPermissionsUsers.js"
+    ]
+  },
+  {
+    "id": "TASK-004",
+    "title": "Add POST/PUT/DELETE API routes for all entities",
+    "description": "Currently only GET routes exist for customers, products, etc. Need full CRUD via REST for frontend integration.",
+    "status": "todo",
+    "priority": "critical",
+    "phase": 2,
+    "files": [
+      "src/app/api/customers/route.js",
+      "src/app/api/products/route.js",
+      "src/app/api/projects/",
+      "src/app/api/contacts/"
+    ]
+  },
+  {
+    "id": "TASK-005",
+    "title": "Create versioned API routes for frontend integration",
+    "description": "Add /api/v1/* routes with CORS, JWT auth, and consistent response format for the public trtmaroc.com frontend.",
+    "status": "todo",
+    "priority": "critical",
+    "phase": 5,
+    "files": []
+  },
+  {
+    "id": "TASK-006",
+    "title": "Add Prisma models for Chat, Mail, Calendar, Invoice",
+    "description": "Added ChatConversation, ChatMessage, MailMessage, CalendarEvent, Invoice, InvoiceItem, Employee to schema.",
+    "status": "done",
+    "priority": "high",
+    "phase": 2,
+    "files": ["prisma/schema.prisma"]
+  },
+  {
+    "id": "TASK-007",
+    "title": "TRT Maroc branding",
+    "description": "Replace logos, update color scheme, app name, meta tags, favicon. Customize login page.",
+    "status": "in-progress",
+    "priority": "medium",
+    "phase": 3,
+    "files": [
+      "public/img/logo/",
+      "src/configs/app.config.js",
+      "src/configs/page-meta.config.js"
+    ]
+  },
+  {
+    "id": "TASK-008",
+    "title": "Arabic & French localization",
+    "description": "Complete Arabic translations (priority), add French translations (messages/fr.json). Test RTL layout.",
+    "status": "todo",
+    "priority": "medium",
+    "phase": 3,
+    "files": ["messages/ar.json", "messages/fr.json"]
+  },
+  {
+    "id": "TASK-009",
+    "title": "Invoice & Devis module",
+    "description": "Add Invoice model, list/create/edit/detail pages, PDF generation, quote management, numbering system (TRT-2026-001).",
+    "status": "todo",
+    "priority": "high",
+    "phase": 4,
+    "files": ["prisma/schema.prisma"]
+  },
+  {
+    "id": "TASK-010",
+    "title": "File upload integration",
+    "description": "Implement file upload for product images, customer avatars, file manager. Support local or S3/Cloudinary.",
+    "status": "done",
+    "priority": "medium",
+    "phase": 2,
+    "files": ["src/app/api/upload/route.js", "src/lib/spaces.js"]
+  },
+  {
+    "id": "TASK-011",
+    "title": "Enable role-based access control in middleware",
+    "description": "RBAC enabled in middleware.js with dynamic route matching. Granular authority built from role accessRight on login. Nav items and route configs use permissions. Role management UI already done.",
+    "status": "done",
+    "priority": "high",
+    "phase": 5,
+    "files": ["src/middleware.js", "src/server/actions/user/validateCredential.js", "src/constants/roles.constant.js", "src/configs/navigation.config/concepts.navigation.config.js", "src/configs/routes.config/conceptsRoute.js"]
+  },
+  {
+    "id": "TASK-012",
+    "title": "Fix PrismaClient initialization error",
+    "description": "Runtime PrismaClientInitializationError — PrismaClient needs valid options. Fixed: created .env with DATABASE_URL, split auth.config.js for edge runtime. User must add real MongoDB connection string.",
+    "status": "done",
+    "priority": "critical",
+    "phase": 1,
+    "files": ["src/lib/prisma.js", "prisma/schema.prisma", ".env"]
+  },
+  {
+    "id": "TASK-013",
+    "title": "Add Prisma models for website integration",
+    "description": "Added PageStat, PageEvent, Comment, Submission, ErrorLog, CalendarEvent, MailMessage, ChatConversation, ChatMessage, Invoice, InvoiceItem, Employee models to schema.",
+    "status": "done",
+    "priority": "critical",
+    "phase": 2,
+    "files": ["prisma/schema.prisma"]
+  },
+  {
+    "id": "TASK-014",
+    "title": "Build /api/v1/* public endpoints for frontend",
+    "description": "Create versioned API routes: views, likes, shares, interactions, comments, comment-likes, submissions, newsletter, leads, 404-log. Must match frontend response shapes exactly.",
+    "status": "todo",
+    "priority": "critical",
+    "phase": 5,
+    "files": []
+  },
+  {
+    "id": "TASK-015",
+    "title": "Build /api/v1/admin/* endpoints for frontend",
+    "description": "Create admin API routes: analytics, google, errors, indexing, index-url, notifications, stats, export. Must match frontend response shapes from architecture report.",
+    "status": "todo",
+    "priority": "critical",
+    "phase": 5,
+    "files": []
+  },
+  {
+    "id": "TASK-016",
+    "title": "Integrate Google APIs (GA4 + Search Console + Indexing)",
+    "description": "Port google-apis.js utilities from frontend: fetchGA4Visitors, fetchKeywordPositions, fetchSearchTraffic, fetchTopPages, fetchDeviceBreakdown, fetchCountryBreakdown, fetchIndexedPages, requestIndexing.",
+    "status": "todo",
+    "priority": "high",
+    "phase": 5,
+    "files": []
+  },
+  {
+    "id": "TASK-017",
+    "title": "SMTP email notifications for form submissions",
+    "description": "Send HTML email via nodemailer when a form is submitted. Fire-and-forget pattern. Requires SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_TO env vars.",
+    "status": "todo",
+    "priority": "medium",
+    "phase": 5,
+    "files": []
+  },
+  {
+    "id": "TASK-018",
+    "title": "CORS middleware for /api/v1/* routes",
+    "description": "Add CORS headers allowing requests from FRONTEND_URL (trtmaroc.com). Only applies to versioned API routes, not internal dashboard routes.",
+    "status": "todo",
+    "priority": "critical",
+    "phase": 5,
+    "files": []
+  },
+  {
+    "id": "TASK-019",
+    "title": "Rate limiting with Redis or in-memory",
+    "description": "Implement rate limiting matching frontend specs: views 5s, likes 5s, shares 5s, comments 10s, submissions 30s, admin login 60s/5 attempts.",
+    "status": "todo",
+    "priority": "high",
+    "phase": 5,
+    "files": []
+  },
+  {
+    "id": "TASK-020",
+    "title": "Data migration script: Netlify Blobs → MongoDB",
+    "description": "Script to import existing data from frontend JSON files (views, likes, shares, comments, submissions, 404s, events) into MongoDB collections.",
+    "status": "todo",
+    "priority": "high",
+    "phase": 5,
+    "files": []
+  },
+  {
+    "id": "TASK-021",
+    "title": "Settings page: wire all tabs to database with full CRUD",
+    "description": "All 4 settings tabs (profile, security, notification, billing/integration) use mock data. Need: 1) Add UserSettings/UserProfile Prisma model, 2) Rewrite API routes to use Prisma instead of mock, 3) Add PUT endpoints for saving, 4) Wire form onSubmit to real API calls. All fields must persist to MongoDB.",
+    "status": "done",
+    "priority": "critical",
+    "phase": 2,
+    "files": [
+      "prisma/schema.prisma",
+      "src/app/api/setting/profile/route.js",
+      "src/app/api/setting/notification/route.js",
+      "src/app/api/setting/billing/route.js",
+      "src/app/api/setting/intergration/route.js",
+      "src/app/(protected-pages)/concepts/account/settings/_components/SettingsProfile.jsx",
+      "src/app/(protected-pages)/concepts/account/settings/_components/SettingsSecurity.jsx",
+      "src/app/(protected-pages)/concepts/account/settings/_components/SettingsNotification.jsx",
+      "src/app/(protected-pages)/concepts/account/settings/_components/SettingsBilling.jsx",
+      "src/app/(protected-pages)/concepts/account/settings/_components/SettingIntegration.jsx",
+      "src/services/AccontsService.js"
+    ]
+  }
+]

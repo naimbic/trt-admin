@@ -17,8 +17,9 @@ const Page = () => {
             </p>
             <p>
                 When you open the starter pack in your local environment,
-                you&apos;ll be directed to the login page. You can sign in using
-                the credentials <i>user: admin | password: 123Qwe</i>.
+                you&apos;ll be directed to the login page. Sign in using
+                the credentials you configured in your <i>.env</i> file
+                (<i>ADMIN_EMAIL</i> / <i>ADMIN_PASSWORD</i>).
             </p>
             <div className="mt-10" id="defaultConfig">
                 <h5>Default Configurations</h5>

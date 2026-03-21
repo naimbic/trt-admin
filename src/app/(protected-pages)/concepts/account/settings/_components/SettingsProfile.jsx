@@ -9,11 +9,14 @@ import { Form, FormItem } from '@/components/ui/Form'
 import NumericInput from '@/components/shared/NumericInput'
 import { countryList } from '@/constants/countries.constant'
 import { components } from 'react-select'
-import { apiGetSettingsProfile } from '@/services/AccontsService'
-import sleep from '@/utils/sleep'
+import { apiGetSettingsProfile, apiPutSettingsProfile } from '@/services/AccontsService'
+import Notification from '@/components/ui/Notification'
+import toast from '@/components/ui/toast'
 import useSWR from 'swr'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, Controller } from 'react-hook-form'
+import { useSession } from 'next-auth/react'
+import useProfileStore from '@/utils/hooks/useProfileStore'
 import { z } from 'zod'
 import { HiOutlineUser } from 'react-icons/hi'
 import { TbPlus } from 'react-icons/tb'
@@ -21,21 +24,19 @@ import { TbPlus } from 'react-icons/tb'
 const { Control } = components
 
 const validationSchema = z.object({
-    firstName: z.string().min(1, { message: 'First name required' }),
-    lastName: z.string().min(1, { message: 'Last name required' }),
+    firstName: z.string().optional().default(''),
+    lastName: z.string().optional().default(''),
     email: z
         .string()
         .min(1, { message: 'Email required' })
         .email({ message: 'Invalid email' }),
-    dialCode: z.string().min(1, { message: 'Please select your country code' }),
-    phoneNumber: z
-        .string()
-        .min(1, { message: 'Please input your mobile number' }),
-    country: z.string().min(1, { message: 'Please select a country' }),
-    address: z.string().min(1, { message: 'Addrress required' }),
-    postcode: z.string().min(1, { message: 'Postcode required' }),
-    city: z.string().min(1, { message: 'City required' }),
-    img: z.string(),
+    dialCode: z.string().optional().default(''),
+    phoneNumber: z.string().optional().default(''),
+    country: z.string().optional().default(''),
+    address: z.string().optional().default(''),
+    postcode: z.string().optional().default(''),
+    city: z.string().optional().default(''),
+    img: z.string().optional().default(''),
 })
 
 const CustomSelectOption = (props) => {
@@ -75,7 +76,9 @@ const CustomControl = ({ children, ...props }) => {
 }
 
 const SettingsProfile = () => {
-    const { data, mutate } = useSWR(
+    const setProfile = useProfileStore((s) => s.setProfile)
+    const { update: updateSession } = useSession()
+    const { data, mutate, isLoading, error: fetchError } = useSWR(
         '/api/settings/profile/',
         () => apiGetSettingsProfile(),
         {
@@ -120,17 +123,53 @@ const SettingsProfile = () => {
     })
 
     useEffect(() => {
-        if (data) {
+        if (data && !data.error) {
             reset(data)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data])
 
     const onSubmit = async (values) => {
-        await sleep(500)
-        if (data) {
-            mutate({ ...data, ...values }, false)
+        try {
+            await apiPutSettingsProfile(values)
+            if (data) {
+                mutate({ ...data, ...values }, false)
+            }
+            // Push to zustand store so header avatar/name updates instantly
+            const displayName = [values.firstName, values.lastName]
+                .filter(Boolean)
+                .join(' ')
+            setProfile({
+                name: displayName || null,
+                image: values.img || null,
+                email: values.email || null,
+            })
+            // Refresh the NextAuth JWT so session persists across page refreshes
+            await updateSession()
+            toast.push(
+                <Notification type="success">Profile saved</Notification>,
+                { placement: 'top-center' },
+            )
+        } catch (error) {
+            toast.push(
+                <Notification type="danger">
+                    {error?.response?.data?.error || 'Failed to save profile'}
+                </Notification>,
+                { placement: 'top-center' },
+            )
         }
+    }
+
+    if (isLoading) {
+        return <div className="py-8 text-center">Loading profile...</div>
+    }
+
+    if (fetchError) {
+        return (
+            <div className="py-8 text-center text-red-500">
+                Failed to load profile. Please refresh the page.
+            </div>
+        )
     }
 
     return (
@@ -154,13 +193,23 @@ const SettingsProfile = () => {
                                         showList={false}
                                         uploadLimit={1}
                                         beforeUpload={beforeUpload}
-                                        onChange={(files) => {
+                                        onChange={async (files) => {
                                             if (files.length > 0) {
-                                                field.onChange(
-                                                    URL.createObjectURL(
-                                                        files[0],
-                                                    ),
-                                                )
+                                                const form = new FormData()
+                                                form.append('file', files[0])
+                                                form.append('folder', 'avatars')
+                                                try {
+                                                    const res = await fetch('/api/upload', {
+                                                        method: 'POST',
+                                                        body: form,
+                                                    })
+                                                    const json = await res.json()
+                                                    if (json.url) {
+                                                        field.onChange(json.url)
+                                                    }
+                                                } catch (err) {
+                                                    console.error('Upload failed:', err)
+                                                }
                                             }
                                         }}
                                     >

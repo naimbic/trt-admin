@@ -1,55 +1,59 @@
-import { userDetailData } from '@/mock/data/usersData'
-import wildCardSearch from '@/utils/wildCardSearch'
-import sortBy from '@/utils/sortBy'
-import paginate from '@/utils/paginate'
+import prisma from '@/lib/prisma'
 
-const getRolesPermissionsUsers = async (_queryParams) => {
-    const queryParams = _queryParams
-
+const getRolesPermissionsUsers = async (queryParams = {}) => {
     const {
         pageIndex = '1',
         pageSize = '10',
         sortKey = '',
-        order,
-        query,
+        order = 'asc',
+        query = '',
+        role = '',
+        status = '',
     } = queryParams
 
-    const users = userDetailData
-
-    let data = structuredClone(users)
-    let total = users.length
-
-    if (sortKey) {
-        if (sortKey !== 'lastOnline') {
-            data.sort(
-                sortBy(sortKey || '', order === 'desc', (a) => a.toUpperCase()),
-            )
-        } else {
-            data.sort(sortBy(sortKey, order === 'desc', parseInt))
-        }
-    }
-
+    const where = {}
+    if (role) where.role = role
+    if (status) where.status = status
     if (query) {
-        data = wildCardSearch(data, query)
-        total = data.length
+        where.OR = [
+            { name: { contains: query, mode: 'insensitive' } },
+            { email: { contains: query, mode: 'insensitive' } },
+        ]
     }
 
-    if (queryParams.role) {
-        const role = queryParams.role
-        data = data.filter((item) => item.role === role)
-    }
+    const total = await prisma.user.count({ where })
 
-    if (queryParams.status) {
-        const status = queryParams.status
-        data = data.filter((item) => item.status === status)
-    }
+    const orderBy = sortKey
+        ? { [sortKey]: order === 'desc' ? 'desc' : 'asc' }
+        : { createdAt: 'desc' }
 
-    data = paginate(data, parseInt(pageSize), parseInt(pageIndex))
+    const users = await prisma.user.findMany({
+        where,
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+            role: true,
+            status: true,
+            lastOnline: true,
+        },
+        orderBy,
+        skip: (parseInt(pageIndex) - 1) * parseInt(pageSize),
+        take: parseInt(pageSize),
+    })
 
-    return {
-        list: data,
-        total: total,
-    }
+    const list = users.map((u) => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        img: u.image,
+        role: u.role || 'user',
+        status: u.status || 'active',
+        lastOnline: u.lastOnline || Math.floor(Date.now() / 1000),
+    }))
+
+    return { list, total }
 }
 
 export default getRolesPermissionsUsers

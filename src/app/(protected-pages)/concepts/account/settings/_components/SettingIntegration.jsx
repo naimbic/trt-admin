@@ -11,7 +11,7 @@ import {
     TbCircleCheckFilled,
     TbRosetteDiscountCheckFilled,
 } from 'react-icons/tb'
-import { apiGetSettingsIntergration } from '@/services/AccontsService'
+import { apiGetSettingsIntergration, apiPutSettingsIntergration } from '@/services/AccontsService'
 
 const SettingIntegration = () => {
     const [selectedIntegration, setSelectedIntegration] = useState({
@@ -40,6 +40,7 @@ const SettingIntegration = () => {
             }),
             false,
         )
+        apiPutSettingsIntergration({ id, active: bool })
     }
 
     const handleDialogClose = () => {

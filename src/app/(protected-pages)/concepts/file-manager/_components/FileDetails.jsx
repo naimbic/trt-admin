@@ -47,8 +47,7 @@ const FileDetails = ({ onShare }) => {
                         <CloseButton onClick={handleDrawerClose} />
                     </div>
                     <div className="mt-10 flex justify-center">
-                        {file.fileType.startsWith('jpeg') ||
-                        file.fileType.startsWith('png') ? (
+                        {['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'bmp'].includes(file.fileType) && file.srcUrl ? (
                             <img
                                 src={file.srcUrl}
                                 className="max-h-[170px] rounded-xl"
@@ -81,7 +80,7 @@ const FileDetails = ({ onShare }) => {
                             <InfoRow
                                 label="Last modified"
                                 value={dayjs
-                                    .unix(file.activities[0].timestamp)
+                                    .unix(file.activities?.[0]?.timestamp || file.uploadDate)
                                     .format('MMM DD, YYYY')}
                             />
                         </div>

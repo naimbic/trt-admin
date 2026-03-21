@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Task Tracker Update",
+  "description": "After agent completes work, check if any tasks in src/data/tasks.json were addressed and update their status accordingly.",
+  "version": "1.0.0",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Review the changes made in this session. Check src/data/tasks.json and see if any tasks were completed or progressed. If so, update their status (todo → in-progress, or in-progress → done). Only update tasks that were actually worked on. Keep the JSON valid."
+  }
+}

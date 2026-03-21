@@ -3,21 +3,42 @@
 import { useState } from 'react'
 import Dialog from '@/components/ui/Dialog'
 import Button from '@/components/ui/Button'
-import DebouceInput from '@/components/shared/DebouceInput'
+import Input from '@/components/ui/Input'
+import toast from '@/components/ui/toast'
+import Notification from '@/components/ui/Notification'
 import { useFileManagerStore } from '../_store/useFileManagerStore'
+import { apiRenameFile } from '@/services/FileService'
 
-const FileManagerRenameDialog = () => {
+const FileManagerRenameDialog = ({ onRenamed }) => {
     const { renameDialog, setRenameDialog, renameFile } = useFileManagerStore()
-
     const [newName, setNewName] = useState('')
+    const [loading, setLoading] = useState(false)
 
     const handleDialogClose = () => {
         setRenameDialog({ id: '', open: false })
+        setNewName('')
     }
 
-    const handleSubmit = () => {
-        renameFile({ id: renameDialog.id, fileName: newName })
-        setRenameDialog({ id: '', open: false })
+    const handleSubmit = async () => {
+        if (!newName.trim()) return
+        setLoading(true)
+        try {
+            await apiRenameFile({ id: renameDialog.id, name: newName.trim() })
+            renameFile({ id: renameDialog.id, fileName: newName.trim() })
+            handleDialogClose()
+            toast.push(
+                <Notification title="File renamed" type="success" />,
+                { placement: 'top-center' },
+            )
+            onRenamed?.()
+        } catch (err) {
+            toast.push(
+                <Notification title="Rename failed" type="danger" />,
+                { placement: 'top-center' },
+            )
+        } finally {
+            setLoading(false)
+        }
     }
 
     return (
@@ -29,10 +50,11 @@ const FileManagerRenameDialog = () => {
         >
             <h4>Rename</h4>
             <div className="mt-6">
-                <DebouceInput
+                <Input
                     placeholder="New name"
-                    type="text"
+                    value={newName}
                     onChange={(e) => setNewName(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
                 />
             </div>
             <div className="mt-6 flex justify-end items-center gap-2">
@@ -42,6 +64,7 @@ const FileManagerRenameDialog = () => {
                 <Button
                     variant="solid"
                     size="sm"
+                    loading={loading}
                     disabled={newName.length === 0}
                     onClick={handleSubmit}
                 >

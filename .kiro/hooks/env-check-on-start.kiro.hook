@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "name": "Environment & DB Connection Check",
+  "description": "When triggered manually, verify that DATABASE_URL is set, Prisma client is generated, and the database is reachable.",
+  "version": "1.0.0",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "node -e \"const { PrismaClient } = require('@prisma/client'); const p = new PrismaClient(); p.$connect().then(() => { console.log('✅ DB connection OK'); return p.$disconnect(); }).catch(e => { console.error('❌ DB connection FAILED:', e.message); process.exit(1); })\"",
+    "timeout": 15
+  }
+}
