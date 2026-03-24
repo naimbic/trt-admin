@@ -5,6 +5,8 @@ import Container from '@/components/shared/Container'
 import BottomStickyBar from '@/components/template/BottomStickyBar'
 import OverviewSection from './OverviewSection'
 import AddressSection from './AddressSection'
+import DeliveryAddressSection from './DeliveryAddressSection'
+import PersonalInfoSection from './PersonalInfoSection'
 import TagsSection from './TagsSection'
 import ProfileImageSection from './ProfileImageSection'
 import AccountSection from './AccountSection'
@@ -20,16 +22,25 @@ const validationSchema = z.object({
         .string()
         .min(1, { message: 'Email required' })
         .email({ message: 'Invalid email' }),
-    dialCode: z.string().min(1, { message: 'Please select your country code' }),
-    phoneNumber: z
-        .string()
-        .min(1, { message: 'Please input your mobile number' }),
-    country: z.string().min(1, { message: 'Please select a country' }),
-    address: z.string().min(1, { message: 'Addrress required' }),
-    postcode: z.string().min(1, { message: 'Postcode required' }),
-    city: z.string().min(1, { message: 'City required' }),
-    img: z.string(),
-    tags: z.array(z.object({ value: z.string(), label: z.string() })),
+    dialCode: z.string().optional().default(''),
+    phoneNumber: z.string().optional().default(''),
+    country: z.string().optional().default(''),
+    address: z.string().optional().default(''),
+    postcode: z.string().optional().default(''),
+    city: z.string().optional().default(''),
+    img: z.string().optional().default(''),
+    tags: z.array(z.object({ value: z.string(), label: z.string() })).optional().default([]),
+    birthday: z.string().optional().default(''),
+    gender: z.string().optional().default(''),
+    password: z.string().optional().default(''),
+    facebook: z.string().optional().default(''),
+    twitter: z.string().optional().default(''),
+    pinterest: z.string().optional().default(''),
+    linkedIn: z.string().optional().default(''),
+    deliveryAddress: z.string().optional().default(''),
+    deliveryCity: z.string().optional().default(''),
+    deliveryCountry: z.string().optional().default(''),
+    deliveryPostcode: z.string().optional().default(''),
 })
 
 const CustomerForm = (props) => {
@@ -78,6 +89,8 @@ const CustomerForm = (props) => {
                     <div className="gap-4 flex flex-col flex-auto">
                         <OverviewSection control={control} errors={errors} />
                         <AddressSection control={control} errors={errors} />
+                        <DeliveryAddressSection control={control} errors={errors} />
+                        <PersonalInfoSection control={control} errors={errors} />
                     </div>
                     <div className="md:w-[370px] gap-4 flex flex-col">
                         <ProfileImageSection

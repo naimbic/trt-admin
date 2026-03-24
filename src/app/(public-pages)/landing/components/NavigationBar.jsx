@@ -81,14 +81,14 @@ const Navigation = ({ toggleMode, mode }) => {
                 <Link href="/">
                     {mode === 'light' && (
                         <img
-                            src="https://trtdigital-ma.ams3.digitaloceanspaces.com/wp-content/uploads/2021/08/trtDigital-Logo-Maroc-2.svg"
+                            src={process.env.NEXT_PUBLIC_LOGO_LIGHT || '/img/logo/logo-light-full.png'}
                             style={{ width: 140, height: 'auto' }}
                             alt="trtdigital logo"
                         />
                     )}
                     {mode === 'dark' && (
                         <img
-                            src="https://trtdigital-ma.ams3.digitaloceanspaces.com/wp-content/uploads/2021/08/trtDigital-Logo-Maroc-light_V4.0.svg"
+                            src={process.env.NEXT_PUBLIC_LOGO_DARK || '/img/logo/logo-dark-full.png'}
                             style={{ width: 140, height: 'auto' }}
                             alt="trtdigital logo"
                         />

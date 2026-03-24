@@ -6,6 +6,8 @@ import Dropdown from '@/components/ui/Dropdown'
 import Badge from '@/components/ui/Badge'
 import MailDeleteConfimation from './MailDeleteConfimation'
 import useResponsive from '@/utils/hooks/useResponsive'
+import useCurrentSession from '@/utils/hooks/useCurrentSession'
+import useAuthority from '@/utils/hooks/useAuthority'
 import { useMailStore } from '../_store/mailStore'
 import useMailAction from '../_hooks/useMailAction'
 import { labelList } from '../constants'
@@ -20,6 +22,9 @@ const MailBodyTop = () => {
     const { onMailDelete, onBatchMoveMailClick } = useMailAction()
 
     const { smaller } = useResponsive()
+    const { session } = useCurrentSession()
+    const userAuthority = session?.user?.authority || []
+    const canDelete = useAuthority(userAuthority, ['mail.delete'])
 
     const hasMailSelected = selectedMailId.length > 0
 
@@ -72,17 +77,19 @@ const MailBodyTop = () => {
                                     </Dropdown.Item>
                                 ))}
                             </Dropdown>
-                            <Button
-                                size="sm"
-                                type="button"
-                                customColorClass={() =>
-                                    'border-error ring-0 ring-error text-error hover:border-error hover:ring-error hover:text-error bg-transparent'
-                                }
-                                icon={<TbTrash />}
-                                onClick={() => setDeleteConfirmationOpen(true)}
-                            >
-                                Delete
-                            </Button>
+                            {canDelete && (
+                                <Button
+                                    size="sm"
+                                    type="button"
+                                    customColorClass={() =>
+                                        'border-error ring-0 ring-error text-error hover:border-error hover:ring-error hover:text-error bg-transparent'
+                                    }
+                                    icon={<TbTrash />}
+                                    onClick={() => setDeleteConfirmationOpen(true)}
+                                >
+                                    Delete
+                                </Button>
+                            )}
                         </>
                     ) : (
                         <Button

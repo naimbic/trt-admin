@@ -6,7 +6,6 @@ import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import ProductForm from '@/components/view/ProductForm'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
-import sleep from '@/utils/sleep'
 import { TbTrash } from 'react-icons/tb'
 import { useRouter } from 'next/navigation'
 
@@ -18,15 +17,30 @@ const ProductCreate = () => {
     const [isSubmiting, setIsSubmiting] = useState(false)
 
     const handleFormSubmit = async (values) => {
-        console.log('Submitted values', values)
         setIsSubmiting(true)
-        await sleep(800)
-        setIsSubmiting(false)
-        toast.push(
-            <Notification type="success">Product created!</Notification>,
-            { placement: 'top-center' },
-        )
-        router.push('/concepts/products/product-list')
+        try {
+            const res = await fetch('/api/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(values),
+            })
+            const json = await res.json()
+            if (!res.ok) {
+                throw new Error(json.error || 'Failed to create product')
+            }
+            toast.push(
+                <Notification type="success">Product created!</Notification>,
+                { placement: 'top-center' },
+            )
+            router.push('/concepts/products/product-list')
+        } catch (err) {
+            toast.push(
+                <Notification type="danger">{err.message}</Notification>,
+                { placement: 'top-center' },
+            )
+        } finally {
+            setIsSubmiting(false)
+        }
     }
 
     const handleConfirmDiscard = () => {

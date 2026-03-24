@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import Button from '@/components/ui/Button'
 import Upload from '@/components/ui/Upload'
 import hooks from '@/components/ui/hooks'
-import { TbPhotoPlus, TbArrowRight } from 'react-icons/tb'
+import { TbPaperclip, TbArrowRight } from 'react-icons/tb'
 
 const { useMergeRef } = hooks
 
@@ -21,7 +21,7 @@ const ChatInput = (props) => {
     }
 
     const handleChange = () => {
-        if (inputRef.current?.value) {
+        if (inputRef.current?.value || attachments.length > 0) {
             onInputChange?.({
                 value: inputRef.current?.value || '',
                 attachments,
@@ -32,11 +32,13 @@ const ChatInput = (props) => {
 
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
-            onInputChange?.({
-                value: inputRef.current?.value || '',
-                attachments,
-            })
-            handleInputClear()
+            if (inputRef.current?.value || attachments.length > 0) {
+                onInputChange?.({
+                    value: inputRef.current?.value || '',
+                    attachments,
+                })
+                handleInputClear()
+            }
         }
     }
 
@@ -57,12 +59,13 @@ const ChatInput = (props) => {
                     fileList={attachments}
                     showList={false}
                     onChange={setAttachments}
+                    accept="*"
                 >
                     <button
                         className="text-xl heading-text hover:text-primary px-1 py-2"
                         type="button"
                     >
-                        <TbPhotoPlus />
+                        <TbPaperclip />
                     </button>
                 </Upload>
                 <input

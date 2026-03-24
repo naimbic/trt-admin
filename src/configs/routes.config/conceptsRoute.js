@@ -2,10 +2,14 @@ import { lazy } from 'react'
 import {
     ADMIN, USER, SUPERVISOR, SUPPORT, AUDITOR, GUEST,
     USERS_READ, USERS_WRITE,
+    CUSTOMERS_READ, CUSTOMERS_WRITE,
     PRODUCTS_READ, PRODUCTS_WRITE,
     CONFIGURATIONS_READ, CONFIGURATIONS_WRITE,
     FILES_READ,
     REPORTS_READ, REPORTS_WRITE,
+    INVOICES_READ, INVOICES_WRITE,
+    CHAT_READ, CHAT_WRITE,
+    MAIL_READ, MAIL_WRITE,
 } from '@/constants/roles.constant'
 
 const conceptsRoute = {
@@ -48,11 +52,11 @@ const conceptsRoute = {
     },
     '/concepts/customers/customer-list': {
         key: 'concepts.customers.customerList',
-        authority: [ADMIN, SUPERVISOR, SUPPORT, USERS_READ],
+        authority: [ADMIN, SUPERVISOR, SUPPORT, CUSTOMERS_READ],
     },
     '/concepts/customers/customer-edit/[slug]': {
         key: 'concepts.customers.customerEdit',
-        authority: [ADMIN, SUPERVISOR, USERS_WRITE],
+        authority: [ADMIN, SUPERVISOR, CUSTOMERS_WRITE],
         meta: {
             header: { title: 'Edit customer', description: 'Manage customer details, purchase history, and preferences.', contained: true },
             footer: false,
@@ -61,7 +65,7 @@ const conceptsRoute = {
     },
     '/concepts/customers/customer-create': {
         key: 'concepts.customers.customerCreate',
-        authority: [ADMIN, SUPERVISOR, USERS_WRITE],
+        authority: [ADMIN, SUPERVISOR, CUSTOMERS_WRITE],
         meta: {
             header: { title: 'Create customer', description: 'Manage customer details, track purchases, and update preferences easily.', contained: true },
             footer: false,
@@ -69,7 +73,7 @@ const conceptsRoute = {
     },
     '/concepts/customers/customer-details/[slug]': {
         key: 'concepts.customers.customerDetails',
-        authority: [ADMIN, SUPERVISOR, SUPPORT, USERS_READ],
+        authority: [ADMIN, SUPERVISOR, SUPPORT, CUSTOMERS_READ],
         meta: { pageContainerType: 'contained' },
         dynamicRoute: true,
     },
@@ -129,6 +133,33 @@ const conceptsRoute = {
         },
         dynamicRoute: true,
     },
+    '/concepts/invoices/invoice-dashboard': {
+        key: 'concepts.invoices.invoiceDashboard',
+        authority: [ADMIN, SUPERVISOR, INVOICES_READ],
+        meta: { pageContainerType: 'contained' },
+    },
+    '/concepts/invoices/invoice-list': {
+        key: 'concepts.invoices.invoiceList',
+        authority: [ADMIN, SUPERVISOR, INVOICES_READ],
+        meta: { pageContainerType: 'contained' },
+    },
+    '/concepts/invoices/invoice-create': {
+        key: 'concepts.invoices.invoiceCreate',
+        authority: [ADMIN, SUPERVISOR, INVOICES_WRITE],
+        meta: { pageContainerType: 'contained' },
+    },
+    '/concepts/invoices/invoice-edit/[slug]': {
+        key: 'concepts.invoices.invoiceEdit',
+        authority: [ADMIN, SUPERVISOR, INVOICES_WRITE],
+        meta: { pageContainerType: 'contained' },
+        dynamicRoute: true,
+    },
+    '/concepts/invoices/invoice-detail/[slug]': {
+        key: 'concepts.invoices.invoiceDetail',
+        authority: [ADMIN, SUPERVISOR, INVOICES_READ],
+        meta: { pageContainerType: 'contained' },
+        dynamicRoute: true,
+    },
     '/concepts/account/settings': {
         key: 'concepts.account.settings',
         authority: [ADMIN, USER, SUPERVISOR, SUPPORT, AUDITOR, GUEST],
@@ -183,12 +214,12 @@ const conceptsRoute = {
     },
     '/concepts/mail': {
         key: 'concepts.mail',
-        authority: [ADMIN, USER, SUPERVISOR, SUPPORT],
+        authority: [ADMIN, USER, SUPERVISOR, SUPPORT, MAIL_READ],
         meta: { pageContainerType: 'contained' },
     },
     '/concepts/chat': {
         key: 'concepts.chat',
-        authority: [ADMIN, USER, SUPERVISOR, SUPPORT],
+        authority: [ADMIN, USER, SUPERVISOR, SUPPORT, CHAT_READ],
         meta: { pageContainerType: 'contained' },
     },
 }

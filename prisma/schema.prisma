@@ -154,6 +154,7 @@ model Customer {
   totalSpending  Float    @default(0)
 
   // Personal info
+  dialCode       String?
   location       String?
   address        String?
   city           String?
@@ -165,6 +166,13 @@ model Customer {
   twitter        String?
   pinterest      String?
   linkedIn       String?
+  password       String?
+
+  // Delivery address
+  deliveryAddress  String?
+  deliveryCity     String?
+  deliveryCountry  String?
+  deliveryPostcode String?
 
   orders         Order[]
   paymentMethods PaymentMethod[]
@@ -354,6 +362,7 @@ model Notification {
   title     String
   message   String
   type      String   @default("info") // info, warning, success, error
+  link      String?  // URL path to navigate to when clicked
   read      Boolean  @default(false)
   date      DateTime @default(now())
 
@@ -365,14 +374,17 @@ model Notification {
 // ==================== CHANGELOG ====================
 
 model Changelog {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  version   String?
-  message   String
-  author    String?
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  version    String?
+  message    String
+  author     String?
   commitHash String?
-  type      String   @default("update") // feature, fix, update, breaking
-  date      DateTime @default(now())
+  type       String   @default("update") // feature, fix, update, breaking
+  project    String   @default("backend") // backend, frontend
+  files      String[] @default([])
+  date       DateTime @default(now())
 
+  @@index([project])
   @@map("changelog")
 }
 
@@ -414,11 +426,12 @@ model File {
 
 // Page interactions (views, likes, shares)
 model PageStat {
-  id    String @id @default(auto()) @map("_id") @db.ObjectId
-  slug  String @unique
-  views Int    @default(0)
-  likes Int    @default(0)
-  shares Int   @default(0)
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  slug     String @unique
+  views    Int    @default(0)
+  likes    Int    @default(0)
+  shares   Int    @default(0)
+  aiClicks Json?
 
   @@map("page_stats")
 }
@@ -433,6 +446,21 @@ model PageEvent {
   @@index([date])
   @@index([slug])
   @@map("page_events")
+}
+
+// Indexing push history
+model IndexingLog {
+  id     String   @id @default(auto()) @map("_id") @db.ObjectId
+  slug   String
+  url    String
+  action String   @default("index") // index, remove, recheck
+  status String   @default("pending") // pending, success, failed
+  method String?  // indexing-api, google-ping
+  error  String?
+  date   DateTime @default(now())
+
+  @@index([slug])
+  @@map("indexing_logs")
 }
 
 // Comments (per-slug, supports nesting via parentId)
@@ -505,22 +533,46 @@ model CalendarEvent {
 
 // ==================== MAIL ====================
 
-model MailMessage {
+model MailThread {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  from      String
-  to        String[]
-  cc        String[]
-  subject   String
-  body      String
-  label     String?  // inbox, sent, draft, starred, trash
+  name      String          // sender display name
+  from      String          // sender email
+  avatar    String?
+  title     String          // subject line
+  label     String?         // work, private, important
+  group     String   @default("inbox") // inbox, sentItem, draft, starred, deleted
+  flagged   Boolean  @default(false)
   starred   Boolean  @default(false)
-  read      Boolean  @default(false)
-  attachments String[]
+  to        String[]        // recipient emails
+  ownerId   String          // userId who owns this thread
 
-  date      DateTime @default(now())
+  messages  MailThreadMessage[]
 
-  @@index([label])
-  @@map("mail_messages")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([group])
+  @@map("mail_threads")
+}
+
+model MailThreadMessage {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  threadId  String   @db.ObjectId
+  name      String          // sender display name
+  from      String          // sender email
+  avatar    String?
+  content   String          // HTML body
+  to        String[]        // recipients
+  date      String          // display date string
+  attachments Json[]        // [{file, size, type}]
+
+  thread    MailThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([threadId])
+  @@map("mail_thread_messages")
 }
 
 // ==================== CHAT ====================
@@ -528,6 +580,8 @@ model MailMessage {
 model ChatConversation {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String?  // group name, null for 1:1
+  avatar      String?  // group avatar
+  chatType    String   @default("personal") // personal, groups
   participantIds String[]
   lastMessage String?
   lastMessageTime DateTime?
@@ -544,8 +598,11 @@ model ChatMessage {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
   conversationId String   @db.ObjectId
   senderId       String
+  senderName     String?
+  senderAvatar   String?
   content        String
-  type           String   @default("text") // text, image, file
+  type           String   @default("regular") // regular, image, file
+  attachments    Json[]   // [{type, mediaUrl}]
 
   conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
@@ -559,17 +616,29 @@ model ChatMessage {
 
 model Invoice {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  number        String   @unique // TRT-2026-001
+  number        String   @unique // FA-042/09/2025
   customerId    String?  @db.ObjectId
   status        String   @default("draft") // draft, sent, paid, overdue, cancelled
   type          String   @default("invoice") // invoice, devis (quote)
   subtotal      Float    @default(0)
+  taxRate       Float    @default(20)
   taxAmount     Float    @default(0)
   total         Float    @default(0)
   currency      String   @default("MAD")
   notes         String?
   dueDate       DateTime?
   paidDate      DateTime?
+
+  // Payment info
+  paymentMethod String?  // cash, bank_transfer, check, card, other
+  paymentAmount Float?
+  paymentDate   DateTime?
+
+  // Recurring invoice
+  recurring         Boolean  @default(false)
+  recurringPeriod   String?  // monthly, yearly
+  recurringCycles   Int?     // 1-12 or 0 for infinite
+  recurringNext     DateTime?
 
   items         InvoiceItem[]
 
@@ -585,6 +654,7 @@ model InvoiceItem {
   invoiceId   String @db.ObjectId
   description String
   quantity    Int    @default(1)
+  unit        String @default("Unité")
   unitPrice   Float
   total       Float
 

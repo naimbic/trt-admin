@@ -52,14 +52,14 @@ const LandingFooter = ({ mode }) => {
                         <Link href="/">
                             {mode === MODE_LIGHT && (
                                 <img
-                                    src="https://trtdigital-ma.ams3.digitaloceanspaces.com/wp-content/uploads/2021/08/trtDigital-Logo-Maroc-2.svg"
+                                    src={process.env.NEXT_PUBLIC_LOGO_LIGHT || '/img/logo/logo-light-full.png'}
                                     style={{ width: 140, height: 'auto' }}
                                     alt="trtdigital logo"
                                 />
                             )}
                             {mode === MODE_DARK && (
                                 <img
-                                    src="https://trtdigital-ma.ams3.digitaloceanspaces.com/wp-content/uploads/2021/08/trtDigital-Logo-Maroc-light_V4.0.svg"
+                                    src={process.env.NEXT_PUBLIC_LOGO_DARK || '/img/logo/logo-dark-full.png'}
                                     style={{ width: 140, height: 'auto' }}
                                     alt="trtdigital logo"
                                 />

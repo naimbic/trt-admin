@@ -1,8 +1,8 @@
 import classNames from 'classnames'
 import { APP_NAME } from '@/constants/app.constant'
 
-const LOGO_LIGHT = 'https://trtdigital-ma.ams3.digitaloceanspaces.com/wp-content/uploads/2021/08/trtDigital-Logo-Maroc-2.svg'
-const LOGO_DARK = 'https://trtdigital-ma.ams3.digitaloceanspaces.com/wp-content/uploads/2021/08/trtDigital-Logo-Maroc-light_V4.0.svg'
+const LOGO_LIGHT = process.env.NEXT_PUBLIC_LOGO_LIGHT || '/img/logo/logo-light-full.png'
+const LOGO_DARK = process.env.NEXT_PUBLIC_LOGO_DARK || '/img/logo/logo-dark-full.png'
 
 const Logo = (props) => {
     const {

@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import classNames from 'classnames'
 import withHeaderItem from '@/utils/hoc/withHeaderItem'
 import Dropdown from '@/components/ui/Dropdown'
@@ -13,36 +13,85 @@ import { HiOutlineMailOpen } from 'react-icons/hi'
 import {
     apiGetNotificationList,
     apiGetNotificationCount,
+    apiMarkNotificationAsRead,
+    apiMarkAllNotificationsAsRead,
 } from '@/services/CommonService'
 import isLastChild from '@/utils/isLastChild'
 import useResponsive from '@/utils/hooks/useResponsive'
 import { useRouter } from 'next/navigation'
 
 const notificationHeight = 'h-[280px]'
+const POLL_INTERVAL = 15000 // 15 seconds
+
+/** Play an Apple-style tri-tone notification chime using Web Audio API */
+const playNotificationSound = () => {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)()
+        const notes = [880, 1046.5, 1318.5] // A5, C6, E6 — major triad
+        notes.forEach((freq, i) => {
+            const osc = ctx.createOscillator()
+            const gain = ctx.createGain()
+            osc.type = 'sine'
+            osc.frequency.value = freq
+            gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.12)
+            gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + i * 0.12 + 0.01)
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.25)
+            osc.connect(gain)
+            gain.connect(ctx.destination)
+            osc.start(ctx.currentTime + i * 0.12)
+            osc.stop(ctx.currentTime + i * 0.12 + 0.25)
+        })
+        setTimeout(() => ctx.close(), 1000)
+    } catch (e) {
+        // Audio not available — silent fallback
+    }
+}
 
 const _Notification = ({ className }) => {
     const [notificationList, setNotificationList] = useState([])
     const [unreadNotification, setUnreadNotification] = useState(false)
+    const [unreadCount, setUnreadCount] = useState(0)
     const [noResult, setNoResult] = useState(false)
     const [loading, setLoading] = useState(false)
+    const prevCountRef = useRef(0)
 
     const { larger } = useResponsive()
 
     const router = useRouter()
 
-    const getNotificationCount = async () => {
-        const resp = await apiGetNotificationCount()
-        if (resp.count > 0) {
-            setNoResult(false)
-            setUnreadNotification(true)
-        } else {
-            setNoResult(true)
+    const getNotificationCount = useCallback(async () => {
+        try {
+            const resp = await apiGetNotificationCount()
+            const count = resp.count || 0
+            if (count > 0) {
+                setNoResult(false)
+                setUnreadNotification(true)
+                setUnreadCount(count)
+                // Play sound only when count increases (new notification arrived)
+                if (count > prevCountRef.current && prevCountRef.current !== -1) {
+                    playNotificationSound()
+                }
+            } else {
+                setNoResult(true)
+                setUnreadNotification(false)
+                setUnreadCount(0)
+            }
+            prevCountRef.current = count
+        } catch (e) {
+            // silent
         }
-    }
+    }, [])
 
     useEffect(() => {
-        getNotificationCount()
-    }, [])
+        // Mark initial as -1 so first load doesn't play sound
+        prevCountRef.current = -1
+        getNotificationCount().then(() => {
+            // After first fetch, set the real count so future polls can compare
+            // prevCountRef is already set inside getNotificationCount
+        })
+        const interval = setInterval(getNotificationCount, POLL_INTERVAL)
+        return () => clearInterval(interval)
+    }, [getNotificationCount])
 
     const onNotificationOpen = async () => {
         if (notificationList.length === 0) {
@@ -53,33 +102,48 @@ const _Notification = ({ className }) => {
         }
     }
 
-    const onMarkAllAsRead = () => {
-        const list = notificationList.map((item) => {
-            if (!item.readed) {
-                item.readed = true
-            }
-            return item
-        })
+    const onMarkAllAsRead = async () => {
+        const list = notificationList.map((item) => ({
+            ...item,
+            readed: true,
+        }))
         setNotificationList(list)
         setUnreadNotification(false)
-    }
-
-    const onMarkAsRead = (id) => {
-        const list = notificationList.map((item) => {
-            if (item.id === id) {
-                item.readed = true
-            }
-            return item
-        })
-        setNotificationList(list)
-        const hasUnread = notificationList.some((item) => !item.readed)
-
-        if (!hasUnread) {
-            setUnreadNotification(false)
+        setUnreadCount(0)
+        prevCountRef.current = 0
+        try {
+            await apiMarkAllNotificationsAsRead()
+        } catch (e) {
+            console.error('Failed to mark all as read:', e)
         }
     }
 
     const notificationDropdownRef = useRef(null)
+
+    const onMarkAsRead = async (item) => {
+        const list = notificationList.map((n) =>
+            n.id === item.id ? { ...n, readed: true } : n
+        )
+        setNotificationList(list)
+        const remaining = list.filter((n) => !n.readed).length
+        setUnreadCount(remaining)
+        prevCountRef.current = remaining
+        if (remaining === 0) {
+            setUnreadNotification(false)
+        }
+        try {
+            await apiMarkNotificationAsRead(item.id)
+        } catch (e) {
+            console.error('Failed to mark as read:', e)
+        }
+        // Navigate to linked page
+        if (item.link) {
+            if (notificationDropdownRef.current) {
+                notificationDropdownRef.current.handleDropdownClose()
+            }
+            router.push(item.link)
+        }
+    }
 
     const handleViewAllActivity = () => {
         router.push('/concepts/account/activity-log')
@@ -95,6 +159,7 @@ const _Notification = ({ className }) => {
                 <NotificationToggle
                     dot={unreadNotification}
                     className={className}
+                    count={unreadCount}
                 />
             }
             menuClass="min-w-[280px] md:min-w-[340px]"
@@ -122,7 +187,7 @@ const _Notification = ({ className }) => {
                         <div key={item.id}>
                             <div
                                 className={`relative rounded-xl flex px-4 py-3 cursor-pointer hover:bg-gray-100 active:bg-gray-100 dark:hover:bg-gray-700`}
-                                onClick={() => onMarkAsRead(item.id)}
+                                onClick={() => onMarkAsRead(item)}
                             >
                                 <div>
                                     <NotificationAvatar {...item} />

@@ -6,7 +6,6 @@ import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import CustomerForm from '@/components/view/CustomerForm'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
-import sleep from '@/utils/sleep'
 import { TbTrash } from 'react-icons/tb'
 import { useRouter } from 'next/navigation'
 
@@ -18,15 +17,30 @@ const CustomerEdit = () => {
     const [isSubmiting, setIsSubmiting] = useState(false)
 
     const handleFormSubmit = async (values) => {
-        console.log('Submitted values', values)
         setIsSubmiting(true)
-        await sleep(800)
-        setIsSubmiting(false)
-        toast.push(
-            <Notification type="success">Customer created!</Notification>,
-            { placement: 'top-center' },
-        )
-        router.push('/concepts/customers/customer-list')
+        try {
+            const res = await fetch('/api/customers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(values),
+            })
+            const json = await res.json()
+            if (!res.ok) {
+                throw new Error(json.error || 'Failed to create customer')
+            }
+            toast.push(
+                <Notification type="success">Customer created!</Notification>,
+                { placement: 'top-center' },
+            )
+            router.push('/concepts/customers/customer-list')
+        } catch (err) {
+            toast.push(
+                <Notification type="danger">{err.message}</Notification>,
+                { placement: 'top-center' },
+            )
+        } finally {
+            setIsSubmiting(false)
+        }
     }
 
     const handleConfirmDiscard = () => {
@@ -62,6 +76,17 @@ const CustomerEdit = () => {
                     city: '',
                     postcode: '',
                     tags: [],
+                    birthday: '',
+                    gender: '',
+                    password: '',
+                    facebook: '',
+                    twitter: '',
+                    linkedIn: '',
+                    pinterest: '',
+                    deliveryAddress: '',
+                    deliveryCity: '',
+                    deliveryCountry: '',
+                    deliveryPostcode: '',
                 }}
                 onFormSubmit={handleFormSubmit}
             >

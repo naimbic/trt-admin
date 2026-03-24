@@ -6,30 +6,18 @@ import ChatBox from '@/components/view/ChatBox'
 import ChatAction from './ChatAction'
 import StartConverstation from '@/assets/svg/StartConverstation'
 import { useChatStore } from '../_store/chatStore'
-import { apiGetConversation } from '@/services/ChatService'
+import { apiGetConversation, apiSendMessage } from '@/services/ChatService'
 import classNames from '@/utils/classNames'
 import useResponsive from '@/utils/hooks/useResponsive'
 import dayjs from 'dayjs'
-import uniqueId from 'lodash/uniqueId'
 import { TbChevronLeft } from 'react-icons/tb'
 
 const getFileType = (file) => {
-    console.log('file.type', file.type)
-    switch (file.type) {
-        case 'image/jpg':
-        case 'image/jpeg':
-        case 'image/png':
-        case 'image/webp':
-            return 'image'
-        case 'video/mp4':
-        case 'video/avi':
-            return 'video'
-        case 'audio/mp3':
-        case 'audio/wav':
-            return 'audio'
-        default:
-            return 'misc'
-    }
+    const mime = file.type || ''
+    if (mime.startsWith('image/')) return 'image'
+    if (mime.startsWith('video/')) return 'video'
+    if (mime.startsWith('audio/')) return 'audio'
+    return 'file'
 }
 
 const ChatBody = () => {
@@ -53,9 +41,11 @@ const ChatBody = () => {
     const { smaller } = useResponsive()
 
     const scrollToBottom = () => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-        }
+        setTimeout(() => {
+            if (scrollRef.current) {
+                scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+            }
+        }, 100)
     }
 
     const handleProfileClick = () => {
@@ -68,34 +58,72 @@ const ChatBody = () => {
     }
 
     const handlePushMessage = (message) => {
-        pushConversationMessage(selectedChat.id, message)
-        setConversation((prevConversation) => {
-            prevConversation.push(message)
-            return structuredClone(prevConversation)
-        })
+        // Only push to local state — zustand record will be stale but
+        // gets refreshed on next conversation load. This avoids the
+        // double-push when conversation state shares the record reference.
+        setConversation((prev) => [...prev, message])
     }
 
     const handleInputChange = async ({ value, attachments }) => {
+        // Upload attachments to DO Spaces first
+        let uploadedAttachments = []
+        if (attachments?.length > 0) {
+            for (const file of attachments) {
+                try {
+                    const formData = new FormData()
+                    formData.append('file', file)
+                    formData.append('folder', 'chat')
+                    const res = await fetch('/api/upload', {
+                        method: 'POST',
+                        body: formData,
+                    })
+                    const data = await res.json()
+                    if (data.url) {
+                        uploadedAttachments.push({
+                            type: getFileType(file),
+                            mediaUrl: data.url,
+                            source: { name: file.name, size: file.size },
+                        })
+                    }
+                } catch (err) {
+                    console.error('Failed to upload attachment:', err)
+                }
+            }
+        }
+
+        const localAttachments = attachments?.map((attachment) => ({
+            type: getFileType(attachment),
+            mediaUrl: URL.createObjectURL(attachment),
+        })) || uploadedAttachments
+
+        // Optimistic local message
         const newMessage = {
-            id: uniqueId('chat-conversation-'),
+            id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
             sender: {
-                id: '1',
-                name: 'Angelina Gotelli',
-                avatarImageUrl: '/img/avatars/thumb-1.jpg',
+                id: 'me',
+                name: '',
+                avatarImageUrl: '',
             },
             content: value,
-            attachments: attachments?.map((attachment) => {
-                return {
-                    type: getFileType(attachment),
-                    source: attachment,
-                    mediaUrl: URL.createObjectURL(attachment),
-                }
-            }),
-            timestamp: dayjs().toDate(),
+            attachments: localAttachments.length > 0 ? localAttachments : uploadedAttachments,
+            timestamp: Math.floor(Date.now() / 1000),
             type: 'regular',
             isMyMessage: true,
         }
         handlePushMessage(newMessage)
+        scrollToBottom()
+
+        // Persist to DB
+        try {
+            await apiSendMessage({
+                id: selectedChat.id,
+                content: value,
+                type: uploadedAttachments.length > 0 ? 'image' : 'regular',
+                attachments: uploadedAttachments,
+            })
+        } catch (err) {
+            console.error('Failed to send message:', err)
+        }
     }
 
     const cardHeaderProps = {
@@ -142,19 +170,11 @@ const ChatBody = () => {
         const fetchConvesation = async () => {
             setIsFetchingConversation(true)
 
-            const record = conversationRecord.find(
-                (item) => item.id === selectedChat.id,
-            )
-
-            if (record) {
-                setConversation(record.conversation)
-            } else {
-                const resp = await apiGetConversation({
-                    id: selectedChat.id,
-                })
-                setConversation(resp.conversation)
-                pushConversationRecord(resp)
-            }
+            // Always fetch fresh from DB to get latest messages
+            const resp = await apiGetConversation({
+                id: selectedChat.id,
+            })
+            setConversation(resp.conversation || [])
 
             setIsFetchingConversation(false)
             scrollToBottom()
@@ -169,11 +189,14 @@ const ChatBody = () => {
 
     const messageList = useMemo(() => {
         return conversation.map((item) => {
-            item.timestamp = dayjs.unix(item.timestamp).toDate()
-            if (item.isMyMessage) {
-                item.showAvatar = false
+            const ts = typeof item.timestamp === 'number'
+                ? dayjs.unix(item.timestamp).toDate()
+                : item.timestamp
+            return {
+                ...item,
+                timestamp: ts,
+                showAvatar: item.isMyMessage ? false : item.showAvatar,
             }
-            return item
         })
     }, [conversation])
 

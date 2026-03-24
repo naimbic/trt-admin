@@ -46,7 +46,7 @@ const Metrics = ({ data, selectedPeriod }) => {
     return (
         <div className="flex flex-col 2xl:flex-col xl:flex-row gap-4">
             <Widget
-                title="Visitor"
+                title="Page Views"
                 value={
                     <NumericFormat
                         displayType="text"
@@ -60,7 +60,7 @@ const Metrics = ({ data, selectedPeriod }) => {
                 iconClass="bg-orange-200"
             />
             <Widget
-                title="Conversion rate"
+                title="Engagement rate"
                 value={`${data.conversionRate.value}%`}
                 growShrink={data.conversionRate.growShrink}
                 compareFrom={vsPeriod[selectedPeriod]}
@@ -68,7 +68,7 @@ const Metrics = ({ data, selectedPeriod }) => {
                 iconClass="bg-emerald-200"
             />
             <Widget
-                title="Ad campaign clicks"
+                title="Interactions"
                 value={
                     <NumericFormat
                         displayType="text"

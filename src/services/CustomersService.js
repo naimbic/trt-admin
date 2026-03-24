@@ -15,3 +15,26 @@ export async function apiGetCustomers({ ...params }) {
         params,
     })
 }
+
+export async function apiCreateCustomer(data) {
+    return ApiService.fetchDataWithAxios({
+        url: `/customers`,
+        method: 'post',
+        data,
+    })
+}
+
+export async function apiUpdateCustomer(id, data) {
+    return ApiService.fetchDataWithAxios({
+        url: `/customers/${id}`,
+        method: 'put',
+        data,
+    })
+}
+
+export async function apiDeleteCustomer(id) {
+    return ApiService.fetchDataWithAxios({
+        url: `/customers/${id}`,
+        method: 'delete',
+    })
+}

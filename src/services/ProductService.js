@@ -15,3 +15,26 @@ export async function apiGetProduct({ id, ...params }) {
         params,
     })
 }
+
+export async function apiCreateProduct(data) {
+    return ApiService.fetchDataWithAxios({
+        url: '/products',
+        method: 'post',
+        data,
+    })
+}
+
+export async function apiUpdateProduct(id, data) {
+    return ApiService.fetchDataWithAxios({
+        url: `/products/${id}`,
+        method: 'put',
+        data,
+    })
+}
+
+export async function apiDeleteProduct(id) {
+    return ApiService.fetchDataWithAxios({
+        url: `/products/${id}`,
+        method: 'delete',
+    })
+}

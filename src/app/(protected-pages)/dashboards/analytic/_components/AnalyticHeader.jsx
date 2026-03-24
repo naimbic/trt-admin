@@ -2,9 +2,10 @@
 import Select from '@/components/ui/Select'
 
 export const options = [
-    { value: 'thisMonth', label: 'Monthly' },
-    { value: 'thisWeek', label: 'Weekly' },
-    { value: 'thisYear', label: 'Annualy' },
+    { value: 'today', label: 'Day' },
+    { value: 'thisWeek', label: 'Week' },
+    { value: 'thisMonth', label: 'Month' },
+    { value: 'thisYear', label: 'Year' },
 ]
 
 const AnalyticHeader = ({ selectedPeriod, onSelectedPeriodChange }) => {

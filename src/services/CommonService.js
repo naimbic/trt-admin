@@ -14,6 +14,22 @@ export async function apiGetNotificationList() {
     })
 }
 
+export async function apiMarkNotificationAsRead(id) {
+    return ApiService.fetchDataWithAxios({
+        url: '/notifications',
+        method: 'put',
+        data: { id },
+    })
+}
+
+export async function apiMarkAllNotificationsAsRead() {
+    return ApiService.fetchDataWithAxios({
+        url: '/notifications',
+        method: 'put',
+        data: { markAll: true },
+    })
+}
+
 export async function apiGetSearchResult(params) {
     return ApiService.fetchDataWithAxios({
         url: '/search',

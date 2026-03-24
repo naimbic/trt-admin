@@ -109,8 +109,9 @@ const initialSelectedCard = {
 
 const BillingSection = ({ data }) => {
     const [selectedCard, setSelectedCard] = useState(initialSelectedCard)
-
     const [dialogOpen, setDialogOpen] = useState(false)
+    const [editingAddress, setEditingAddress] = useState(null) // 'billing' | 'delivery' | null
+    const [addressForm, setAddressForm] = useState({})
 
     const table = useReactTable({
         data: data.orderHistory || [],
@@ -124,6 +125,12 @@ const BillingSection = ({ data }) => {
             (country) => country.value === data.personalInfo?.country,
         )?.label
     }, [data.personalInfo?.country])
+
+    const deliveryCountryName = useMemo(() => {
+        return countryList.find(
+            (country) => country.value === data.personalInfo?.deliveryCountry,
+        )?.label
+    }, [data.personalInfo?.deliveryCountry])
 
     const handleEdit = (cardHolderName, cardExpiry) => {
         setSelectedCard({
@@ -143,10 +150,47 @@ const BillingSection = ({ data }) => {
         handleEditClose()
         toast.push(
             <Notification title={'Successfully updated!'} type="success" />,
-            {
-                placement: 'top-center',
-            },
+            { placement: 'top-center' },
         )
+    }
+
+    const handleEditAddress = (type) => {
+        if (type === 'billing') {
+            setAddressForm({
+                address: data.personalInfo?.address || '',
+                city: data.personalInfo?.city || '',
+                postcode: data.personalInfo?.postcode || '',
+                country: data.personalInfo?.country || '',
+            })
+        } else {
+            setAddressForm({
+                address: data.personalInfo?.deliveryAddress || '',
+                city: data.personalInfo?.deliveryCity || '',
+                postcode: data.personalInfo?.deliveryPostcode || '',
+                country: data.personalInfo?.deliveryCountry || '',
+            })
+        }
+        setEditingAddress(type)
+    }
+
+    const handleSaveAddress = async () => {
+        try {
+            const payload = editingAddress === 'billing'
+                ? { firstName: data.firstName, lastName: data.lastName, email: data.email, address: addressForm.address, city: addressForm.city, postcode: addressForm.postcode, country: addressForm.country }
+                : { firstName: data.firstName, lastName: data.lastName, email: data.email, deliveryAddress: addressForm.address, deliveryCity: addressForm.city, deliveryPostcode: addressForm.postcode, deliveryCountry: addressForm.country }
+            const res = await fetch(`/api/customers/${data.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            })
+            if (!res.ok) throw new Error('Failed to save')
+            toast.push(<Notification title="Address updated!" type="success" />, { placement: 'top-center' })
+            setEditingAddress(null)
+            // Refresh page to show updated data
+            window.location.reload()
+        } catch {
+            toast.push(<Notification title="Error saving address" type="danger" />, { placement: 'top-center' })
+        }
     }
 
     return (
@@ -178,26 +222,52 @@ const BillingSection = ({ data }) => {
             <h6 className="mt-8">Addresses</h6>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                 <Card>
-                    <div className="font-bold heading-text">
-                        Billing Address
+                    <div className="flex items-center justify-between">
+                        <div className="font-bold heading-text">Billing Address</div>
+                        <Button size="xs" onClick={() => handleEditAddress('billing')}>
+                            {editingAddress === 'billing' ? 'Cancel' : 'Edit'}
+                        </Button>
                     </div>
-                    <div className="mt-4 flex flex-col gap-1 font-semibold">
-                        <span>{data.personalInfo?.address}</span>
-                        <span>{data.personalInfo?.city}</span>
-                        <span>{data.personalInfo?.postcode}</span>
-                        <span>{countryName}</span>
-                    </div>
+                    {editingAddress === 'billing' ? (
+                        <div className="mt-4 flex flex-col gap-2">
+                            <input className="input input-sm border rounded px-2 py-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Address" value={addressForm.address} onChange={e => setAddressForm(p => ({ ...p, address: e.target.value }))} />
+                            <input className="input input-sm border rounded px-2 py-1 dark:bg-gray-700 dark:border-gray-600" placeholder="City" value={addressForm.city} onChange={e => setAddressForm(p => ({ ...p, city: e.target.value }))} />
+                            <input className="input input-sm border rounded px-2 py-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Postal Code" value={addressForm.postcode} onChange={e => setAddressForm(p => ({ ...p, postcode: e.target.value }))} />
+                            <input className="input input-sm border rounded px-2 py-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Country Code" value={addressForm.country} onChange={e => setAddressForm(p => ({ ...p, country: e.target.value }))} />
+                            <Button size="sm" variant="solid" className="mt-2" onClick={handleSaveAddress}>Save</Button>
+                        </div>
+                    ) : (
+                        <div className="mt-4 flex flex-col gap-1 font-semibold">
+                            <span>{data.personalInfo?.address || '—'}</span>
+                            <span>{data.personalInfo?.city}</span>
+                            <span>{data.personalInfo?.postcode}</span>
+                            <span>{countryName}</span>
+                        </div>
+                    )}
                 </Card>
                 <Card>
-                    <div className="font-bold heading-text">
-                        Delivery Address
+                    <div className="flex items-center justify-between">
+                        <div className="font-bold heading-text">Delivery Address</div>
+                        <Button size="xs" onClick={() => handleEditAddress('delivery')}>
+                            {editingAddress === 'delivery' ? 'Cancel' : 'Edit'}
+                        </Button>
                     </div>
-                    <div className="mt-4 flex flex-col gap-1 font-semibold">
-                        <span>{data.personalInfo?.address}</span>
-                        <span>{data.personalInfo?.city}</span>
-                        <span>{data.personalInfo?.postcode}</span>
-                        <span>{countryName}</span>
-                    </div>
+                    {editingAddress === 'delivery' ? (
+                        <div className="mt-4 flex flex-col gap-2">
+                            <input className="input input-sm border rounded px-2 py-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Address" value={addressForm.address} onChange={e => setAddressForm(p => ({ ...p, address: e.target.value }))} />
+                            <input className="input input-sm border rounded px-2 py-1 dark:bg-gray-700 dark:border-gray-600" placeholder="City" value={addressForm.city} onChange={e => setAddressForm(p => ({ ...p, city: e.target.value }))} />
+                            <input className="input input-sm border rounded px-2 py-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Postal Code" value={addressForm.postcode} onChange={e => setAddressForm(p => ({ ...p, postcode: e.target.value }))} />
+                            <input className="input input-sm border rounded px-2 py-1 dark:bg-gray-700 dark:border-gray-600" placeholder="Country Code" value={addressForm.country} onChange={e => setAddressForm(p => ({ ...p, country: e.target.value }))} />
+                            <Button size="sm" variant="solid" className="mt-2" onClick={handleSaveAddress}>Save</Button>
+                        </div>
+                    ) : (
+                        <div className="mt-4 flex flex-col gap-1 font-semibold">
+                            <span>{data.personalInfo?.deliveryAddress || '—'}</span>
+                            <span>{data.personalInfo?.deliveryCity}</span>
+                            <span>{data.personalInfo?.deliveryPostcode}</span>
+                            <span>{deliveryCountryName}</span>
+                        </div>
+                    )}
                 </Card>
             </div>
             <h6 className="mt-8">Payment Methods</h6>

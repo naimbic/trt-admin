@@ -1,5 +1,582 @@
 [
   {
+    "version": "2.3.0",
+    "date": "2026-03-24",
+    "type": "fix",
+    "message": "Fixed Page Stats AI column — added aiClicks Json field to PageStat Prisma model (was present in MongoDB but missing from schema). AI count now correctly sums per-engine clicks (chatgpt, gemini, claude, perplexity, grok) from the embedded aiClicks object. Fixed changelog tab switching bug — Segment onChange returns string not array. Hardened changelog API for empty project param.",
+    "files": [
+      "prisma/schema.prisma",
+      "src/app/(protected-pages)/dashboards/analytic/_components/PageStats.jsx",
+      "src/app/(protected-pages)/guide/changelog/page.jsx",
+      "src/app/api/changelog/route.js"
+    ]
+  },
+  {
+    "version": "2.2.9",
+    "date": "2026-03-24",
+    "type": "feature",
+    "message": "Added Page Stats section to Analytics tab with server-side pagination, sortable columns (views/likes/shares), and search. Removed incorrect AI column (no backing data). Fixed changelog tab switching bug — Segment onChange returns string not array, causing project filter to break when switching back to backend. Indexing tab now paginated (15/page). Changelog API supports pagination (?page&limit), frontend uses Pagination component. Created Submissions & 404 Logs API: POST/GET /api/submissions, PATCH /api/submissions/:id, POST /api/404-log (with CORS, rate limiting, dedup), GET /api/admin/errors.",
+    "files": [
+      "src/server/actions/getPageStats.js",
+      "src/app/(protected-pages)/dashboards/analytic/_components/PageStats.jsx",
+      "src/app/(protected-pages)/dashboards/analytic/_components/AnalyticDashboard.jsx",
+      "src/app/(protected-pages)/dashboards/analytic/_components/TabIndexing.jsx",
+      "src/app/(protected-pages)/guide/changelog/page.jsx",
+      "src/app/api/changelog/route.js",
+      "src/app/api/submissions/route.js",
+      "src/app/api/submissions/[id]/route.js",
+      "src/app/api/404-log/route.js",
+      "src/app/api/admin/errors/route.js",
+      "src/lib/cors.js"
+    ]
+  },
+  {
+    "version": "2.2.8",
+    "date": "2026-03-24",
+    "type": "fix",
+    "message": "GA4 chart now pads missing days with zeros so the full month/week is shown (e.g. March 1–24 instead of only 14 data points starting from March 11). Forced full .next rebuild to clear stale Turbopack cache.",
+    "files": [
+      "src/app/(protected-pages)/dashboards/analytic/_components/TabGoogle.jsx"
+    ]
+  },
+  {
+    "version": "2.2.7",
+    "date": "2026-03-24",
+    "type": "fix",
+    "message": "Hour labels on Day filter changed to plain 24h numbers (0–23) across Analytics and Google tabs. GA4 chart x-axis labels always visible so actual data dates are clear. GA4 data starts from March 11 (service account grant date) with ~24h processing delay — not a bug.",
+    "files": [
+      "src/server/actions/getAnalyticDashboard.js",
+      "src/app/(protected-pages)/dashboards/analytic/_components/TabGoogle.jsx"
+    ]
+  },
+  {
+    "version": "2.2.6",
+    "date": "2026-03-24",
+    "type": "update",
+    "message": "Filter choices now persist across page refresh via localStorage (analytics period, Google period, active tab). Fixed GA4 chart date filtering cutting off mid-month. Time format changed to 24h (00:00–23:00) across all dashboard charts.",
+    "files": [
+      "src/app/(protected-pages)/dashboards/analytic/_components/AnalyticDashboard.jsx",
+      "src/app/(protected-pages)/dashboards/analytic/_components/TabGoogle.jsx",
+      "src/server/actions/getAnalyticDashboard.js"
+    ]
+  },
+  {
+    "version": "2.2.5",
+    "date": "2026-03-24",
+    "type": "update",
+    "message": "Period filter defaults to Day on both Analytics and Google tabs. Filter order: Day/Week/Month/Year. Compact chart labels: 0H–23H (day), Mo/Tu/We (week), 1–31 (month), Jan–Dec (year). Google tab GA4 chart filters by period with compact x-axis labels. Added GA4 summary cards (Pageviews/Sessions/Users) that update with period. All graphs and metric cards respond to filter changes.",
+    "files": [
+      "src/server/actions/getAnalyticDashboard.js",
+      "src/app/(protected-pages)/dashboards/analytic/_components/AnalyticHeader.jsx",
+      "src/app/(protected-pages)/dashboards/analytic/_components/AnalyticDashboard.jsx",
+      "src/app/(protected-pages)/dashboards/analytic/_components/TabGoogle.jsx"
+    ]
+  },
+  {
+    "version": "2.2.4",
+    "date": "2026-03-24",
+    "type": "feature",
+    "message": "Added Daily period filter to Analytics tab with hourly buckets (00:00–23:00). Google tab now has matching 'Show by' dropdown (Daily/Weekly/Monthly/Last 90 Days) filtering GA4 chart client-side. Removed debug console.logs from getGoogleAnalytics.",
+    "files": [
+      "src/server/actions/getAnalyticDashboard.js",
+      "src/app/(protected-pages)/dashboards/analytic/_components/AnalyticHeader.jsx",
+      "src/app/(protected-pages)/dashboards/analytic/_components/TabGoogle.jsx",
+      "src/server/actions/getGoogleAnalytics.js"
+    ]
+  },
+  {
+    "version": "2.2.3",
+    "date": "2026-03-23",
+    "type": "fix",
+    "message": "Fixed Google APIs returning null — JWT auth constructor changed from positional args to options object form. GA4, Search Console, and URL Inspection API all working now. Fixed indexed status: uses URL Inspection API for real index verdict (PASS/FAIL) instead of SC impressions-only heuristic, with inspect results cached in IndexingLog. Indexing tab: 2-hour cooldown after index request (button disabled), compact relative time in Last Push column (1m/2h/3d — no wrapping), bulk index survives tab switch via useRef with cancel button and progress counter, inspect button per page to check real Google index status on demand.",
+    "files": [
+      "src/lib/google-apis.js",
+      "src/server/actions/getGoogleAnalytics.js",
+      "src/app/api/google/index-url/route.js",
+      "src/app/(protected-pages)/dashboards/analytic/_components/TabIndexing.jsx"
+    ]
+  },
+  {
+    "version": "2.2.2",
+    "date": "2026-03-23",
+    "type": "update",
+    "message": "Improved Google and Indexing tabs. Google tab: proper 'Not Configured' state showing env var names, 'No Data' fallback, null/empty guards, icon summary cards, device progress bars, country flags. Indexing tab: compact icon-only design — type (TbFileText/TbArticle/TbBriefcase) and status (TbCircleCheck/TbCircleX) as tooltip icons with no text, tighter table layout, bulk index with checkbox selection, dynamic Select to fix hydration.",
+    "files": [
+      "src/app/(protected-pages)/dashboards/analytic/_components/TabGoogle.jsx",
+      "src/app/(protected-pages)/dashboards/analytic/_components/TabIndexing.jsx"
+    ]
+  },
+  {
+    "version": "2.2.1",
+    "date": "2026-03-23",
+    "type": "feature",
+    "message": "Indexing tab rebuilt with full page list from PageStat (72 pages). Shows name, path, type badge (Page/Blog/Portfolio), views, indexed status from Search Console, last push time (relative), and smart actions: disabled push for indexed pages, green push for not-indexed, recheck and remove buttons. Added IndexingLog Prisma model to track all push requests with timestamp/status/method. Filters for search, type, and status. Custom URL indexing input. API route logs every push to DB.",
+    "files": [
+      "prisma/schema.prisma",
+      "src/server/actions/getGoogleAnalytics.js",
+      "src/app/api/google/index-url/route.js",
+      "src/app/(protected-pages)/dashboards/analytic/_components/TabIndexing.jsx"
+    ]
+  },
+  {
+    "version": "2.2.0",
+    "date": "2026-03-23",
+    "type": "feature",
+    "message": "Google Analytics & Search Console integration. Added google-apis.js utility with GA4 visitors, SC keywords, search traffic, top pages, device/country breakdown, and indexing API functions. Analytics dashboard now has 3 tabs: Analytics, Google, Indexing. Fixed hydration mismatch from react-select by dynamically importing AnalyticHeader with ssr:false. Requires GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY, GA4_PROPERTY_ID, SEARCH_CONSOLE_SITE_URL env vars.",
+    "files": [
+      "src/lib/google-apis.js",
+      "src/server/actions/getGoogleAnalytics.js",
+      "src/app/api/google/index-url/route.js",
+      "src/app/(protected-pages)/dashboards/analytic/_components/TabGoogle.jsx",
+      "src/app/(protected-pages)/dashboards/analytic/_components/TabIndexing.jsx",
+      "src/app/(protected-pages)/dashboards/analytic/_components/AnalyticDashboard.jsx",
+      "src/app/(protected-pages)/dashboards/analytic/page.jsx"
+    ]
+  },
+  {
+    "version": "2.1.9",
+    "date": "2026-03-23",
+    "type": "fix",
+    "message": "Fixed analytics dashboard showing all zeros. Backfilled null date fields on 8,750 PageEvent records. Rewrote getAnalyticDashboard to use raw MongoDB aggregate with $ifNull to coalesce date/createdAt fields, so it works regardless of which field the frontend sets. Added noStore() to prevent Next.js caching stale data. Dashboard now shows real stats: 2,863 events this month, 8,261 this year.",
+    "files": [
+      "src/server/actions/getAnalyticDashboard.js"
+    ]
+  },
+  {
+    "version": "2.1.8",
+    "date": "2026-03-23",
+    "type": "feature",
+    "message": "Changelog moved to MongoDB. Added project and files fields to Changelog Prisma model to support backend/frontend separation. New API at GET/POST /api/changelog with project filter. Changelog page rewritten as client component with Backend/Frontend toggle tabs, type badges, and file list display. Seed script imports all 66 existing JSON entries as backend project. Frontend dev can POST entries with project:'frontend'.",
+    "files": [
+      "prisma/schema.prisma",
+      "src/app/api/changelog/route.js",
+      "src/app/(protected-pages)/guide/changelog/page.jsx",
+      "prisma/seed-changelog.js"
+    ]
+  },
+  {
+    "version": "2.1.7",
+    "date": "2026-03-23",
+    "type": "feature",
+    "message": "Analytics dashboard wired to MongoDB via Prisma. getAnalyticDashboard now queries PageEvent collection for real views, likes, and shares data with weekly/monthly/yearly period filtering and previous-period growth comparison. Chart legend updated to Views/Likes/Shares. Metric cards renamed to Page Views, Engagement rate, Interactions. Top pages derived from actual slug view counts. Graceful fallback on error.",
+    "files": [
+      "src/server/actions/getAnalyticDashboard.js",
+      "src/app/(protected-pages)/dashboards/analytic/_components/AnalyticChart.jsx",
+      "src/app/(protected-pages)/dashboards/analytic/_components/Metrics.jsx"
+    ]
+  },
+  {
+    "version": "2.1.6",
+    "date": "2026-03-22",
+    "type": "update",
+    "message": "Improved mail attachment experience in detail view. Image attachments now show inline thumbnail previews with hover overlay for open/download. Download button uses fetch+blob to force actual file download on cross-origin CDN URLs. Non-image files retain file icon card with open and download buttons.",
+    "files": [
+      "src/app/(protected-pages)/concepts/mail/_components/MailDetailContent.jsx"
+    ]
+  },
+  {
+    "version": "2.1.5",
+    "date": "2026-03-22",
+    "type": "feature",
+    "message": "Mail listing now shows a paperclip icon next to the subject (desktop) and sender name (mobile) when any message in the thread has attachments. Attachment viewing and downloading was already supported in the detail view.",
+    "files": [
+      "src/app/(protected-pages)/concepts/mail/_components/MailList.jsx"
+    ]
+  },
+  {
+    "version": "2.1.4",
+    "date": "2026-03-21",
+    "type": "update",
+    "message": "Chat and mail delete actions now respect RBAC permissions. Delete buttons only render when user role has chat.delete or mail.delete enabled. Applied to ChatAction dropdown, MailBodyTop bulk delete, and MailList per-row delete (desktop + mobile). Uses useCurrentSession + useAuthority hooks consistent with existing nav permission pattern.",
+    "files": [
+      "src/app/(protected-pages)/concepts/chat/_components/ChatAction.jsx",
+      "src/app/(protected-pages)/concepts/mail/_components/MailBodyTop.jsx",
+      "src/app/(protected-pages)/concepts/mail/_components/MailList.jsx"
+    ]
+  },
+  {
+    "version": "2.1.3",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Chat and group conversations now permanently delete from DB. Added DELETE /api/chat/[id] endpoint that removes all messages then the conversation. ChatAction delete button calls the API instead of only clearing local state.",
+    "files": [
+      "src/app/api/chat/[id]/route.js",
+      "src/app/(protected-pages)/concepts/chat/_components/ChatAction.jsx"
+    ]
+  },
+  {
+    "version": "2.1.2",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Fixed mail not permanently deleting from Deleted folder. Deleting mail already in Deleted now hard-deletes from DB via DELETE /api/mail/[id]. Deleting from other folders still soft-deletes (moves to Deleted).",
+    "files": [
+      "src/app/(protected-pages)/concepts/mail/_hooks/useMailAction.js"
+    ]
+  },
+  {
+    "version": "2.1.1",
+    "date": "2026-03-21",
+    "type": "update",
+    "message": "Added delete permission for Chat and Mail roles. New CHAT_DELETE and MAIL_DELETE constants. Chat and Mail modules in Roles & Permissions dialog now show Read/Write/Delete toggles (was Read/Write only). Admin, Supervisor, and Support default roles updated with delete access. Cleared old roles from DB to re-seed.",
+    "files": [
+      "src/constants/roles.constant.js",
+      "src/app/(protected-pages)/concepts/account/roles-permissions/constants.js",
+      "src/app/api/roles/route.js"
+    ]
+  },
+  {
+    "version": "2.1.0",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Fixed build error 'Cannot assign to this' in invoice dashboard. The StatisticCard component declaration was missing its const variable name (line 89 had ' = ({...' instead of 'const StatisticCard = ({...'). Restored the missing prefix to fix Turbopack parse failure.",
+    "files": [
+      "src/app/(protected-pages)/concepts/invoices/invoice-dashboard/page.jsx"
+    ]
+  },
+  {
+    "version": "2.0.9",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Fixed invoice dashboard chart showing absurdly long Y-axis numbers (200000.00000000000). Y-axis and tooltips now use K/M abbreviation (e.g. 165.2K MAD). Top Countries section now shows full country names (Morocco, United States) instead of ISO codes (MA, US) with correct flag images and map tooltip support. Added codeToCountry reverse lookup map.",
+    "files": [
+      "src/app/(protected-pages)/concepts/invoices/invoice-dashboard/page.jsx"
+    ]
+  },
+  {
+    "version": "2.0.8",
+    "date": "2026-03-21",
+    "type": "update",
+    "message": "Invoice dashboard redesigned to match ecommerce dashboard pattern. Overview and Payment Target now default to Monthly filter (was All Time). Numbers use K/M abbreviation via AbbreviateNumber component (e.g. 82.4K, 1.3M). Percentage changes use GrowShrinkValue with colored +/- indicators. Payment Target has its own period dropdown (Monthly/Weekly/Annualy) matching Sales Target design. Summary and Amounts sections also use abbreviated numbers. Added granular RBAC permissions for chat, mail, customers with icons in Roles dialog. Fixed notification 404 links.",
+    "files": [
+      "src/app/(protected-pages)/concepts/invoices/invoice-dashboard/page.jsx",
+      "src/constants/roles.constant.js",
+      "src/app/(protected-pages)/concepts/account/roles-permissions/constants.js",
+      "src/app/(protected-pages)/concepts/account/roles-permissions/_components/RolesPermissionsAccessDialog.jsx",
+      "src/app/api/roles/route.js",
+      "src/configs/navigation.config/concepts.navigation.config.js",
+      "src/configs/routes.config/conceptsRoute.js",
+      "src/app/api/chat/[id]/route.js"
+    ]
+  },
+  {
+    "version": "2.0.7",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Added granular RBAC permissions for all new features: chat (read/write), mail (read/write), customers (read/write/delete). Invoices permissions already existed. Updated all 6 default roles with appropriate access levels. Navigation and route configs now use dedicated permission constants (CUSTOMERS_READ, CHAT_READ, MAIL_READ) instead of overloading USERS_READ. Roles & Permissions dialog shows new modules with icons (TbMessageCircle, TbMail, TbFileInvoice, TbUsers). Fixed notification links causing 404 — chat link changed from /concepts/chat/:id to /concepts/chat since chat uses state-based routing. Cleared old roles from DB to re-seed with new permissions.",
+    "files": [
+      "src/constants/roles.constant.js",
+      "src/app/(protected-pages)/concepts/account/roles-permissions/constants.js",
+      "src/app/(protected-pages)/concepts/account/roles-permissions/_components/RolesPermissionsAccessDialog.jsx",
+      "src/app/api/roles/route.js",
+      "src/configs/navigation.config/concepts.navigation.config.js",
+      "src/configs/routes.config/conceptsRoute.js",
+      "src/app/api/chat/[id]/route.js"
+    ]
+  },
+  {
+    "version": "2.0.6",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Notifications now link to their source page — clicking a chat notification navigates to the conversation, mail notification goes to inbox, invoice notification opens the invoice detail. Added Apple-style tri-tone notification sound (Web Audio API, no external files) that plays when new notifications arrive. Polling every 15 seconds for real-time awareness. Bell icon now shows numeric unread count badge (red circle) instead of just a dot. Added link field to Notification Prisma model.",
+    "files": [
+      "prisma/schema.prisma",
+      "src/lib/notify.js",
+      "src/app/api/notifications/route.js",
+      "src/app/api/chat/[id]/route.js",
+      "src/app/api/mail/route.js",
+      "src/app/api/invoices/[id]/route.js",
+      "src/components/template/Notification/Notification.jsx",
+      "src/components/template/Notification/NotificationToggle.jsx"
+    ]
+  },
+  {
+    "version": "2.0.5",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Notification system fully wired to Prisma. Notifications created automatically for: chat messages (all other participants notified), new mail (recipient notified), invoice status changes to sent/paid (admin users notified). Mark as read and mark all as read now persist to DB via PUT /api/notifications. NotificationAvatar displays contextual icons — person avatar for chat, calendar icon for mail, clipboard icon for invoices. Fixed 500 error on /api/notifications and /api/notifications/count (were importing from mock data, now use Prisma).",
+    "files": [
+      "src/app/api/notifications/route.js",
+      "src/app/api/notifications/count/route.js",
+      "src/lib/notify.js",
+      "src/app/api/chat/[id]/route.js",
+      "src/app/api/mail/route.js",
+      "src/app/api/invoices/[id]/route.js",
+      "src/components/template/Notification/Notification.jsx",
+      "src/services/CommonService.js"
+    ]
+  },
+  {
+    "version": "2.0.4",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Three chat UX improvements: (1) Unread badge now shows the actual count number instead of just a dot in the conversation list. (2) Chat scrolls to bottom when opening a conversation and after sending a message (100ms delay for DOM render). (3) URLs in chat messages are now clickable links — linkifyContent detects https/http URLs and renders them as anchor tags with target=_blank.",
+    "files": [
+      "src/app/(protected-pages)/concepts/chat/_components/ChatList.jsx",
+      "src/app/(protected-pages)/concepts/chat/_components/ChatBody.jsx",
+      "src/components/view/ChatBox/components/Message.jsx"
+    ]
+  },
+  {
+    "version": "2.0.3",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Fixed 4 issues: (1) Mail delete now moves to Deleted folder instead of hard-deleting from DB. (2) Fixed uncontrolled-to-controlled Checkbox error in MailList — mail.checked was undefined from DB, now coerced with !!. (3) Chat group member management — added Add/Remove member buttons in ContactInfoDrawer with contact picker dialog, backed by new PUT /api/chat/[id] endpoint. (4) Media/Files/Links tabs in contact drawer now show real data extracted from conversation message attachments and content URLs instead of empty arrays.",
+    "files": [
+      "src/app/(protected-pages)/concepts/mail/_hooks/useMailAction.js",
+      "src/app/(protected-pages)/concepts/mail/_components/MailList.jsx",
+      "src/app/api/chat/[id]/route.js",
+      "src/app/api/contacts/[id]/route.js",
+      "src/app/(protected-pages)/concepts/chat/_components/ContactInfoDrawer.jsx"
+    ]
+  },
+  {
+    "version": "2.0.2",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Chat and mail now support all non-dangerous file types (PDF, DOC, XLS, ZIP, images, video, audio, etc.). Upload route blocks dangerous extensions (exe, bat, sh, dll, etc.). Chat: attachment icon changed from photo-only to paperclip, accepts any safe file, sends file name/size metadata. Chat Attachment component redesigned with file-type icons, hover download/open buttons on images/videos, inline open+download for documents. Mail: MailDetailContent now shows download and open icons on each attachment, plus a per-message reply button. ChatInput allows sending attachments without text.",
+    "files": [
+      "src/app/api/upload/route.js",
+      "src/components/view/ChatBox/components/Attachment.jsx",
+      "src/components/view/ChatBox/components/ChatInput.jsx",
+      "src/app/(protected-pages)/concepts/chat/_components/ChatBody.jsx",
+      "src/app/(protected-pages)/concepts/mail/_components/MailDetailContent.jsx"
+    ]
+  },
+  {
+    "version": "2.0.1",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Fixed 3 remaining mail/chat issues: (1) Moving mail to a label (Work/Private/Important) no longer makes it disappear — onMoveMailClick and onBatchMoveMailClick now update the label field instead of group. (2) Added file attachment support to mail compose — upload files to DO Spaces via /api/upload, display as removable chips, save attachment metadata to MailThreadMessage.attachments. (3) Group chat invite already working from previous fix (switches to groups tab after creation).",
+    "files": [
+      "src/app/(protected-pages)/concepts/mail/_hooks/useMailAction.js",
+      "src/app/(protected-pages)/concepts/mail/_components/MailEditor.jsx",
+      "src/app/api/mail/route.js"
+    ]
+  },
+  {
+    "version": "2.0.0",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Fixed 3 chat/mail issues: (1) Double messages — handlePushMessage was pushing to both zustand record and local state sharing the same array reference; now only updates local state and always fetches fresh from DB on conversation switch. (2) Chat images not sending — attachments were discarded (sent as empty array); now uploads to DO Spaces via /api/upload first, then sends CDN URLs in message payload. (3) Mail not received by recipient — POST only created sentItem for sender; now also creates inbox thread for recipient by looking up their userId via email.",
+    "files": [
+      "src/app/(protected-pages)/concepts/chat/_components/ChatBody.jsx",
+      "src/app/api/mail/route.js"
+    ]
+  },
+  {
+    "version": "1.9.9",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Fixed duplicate chat messages and React key collision error. Replaced lodash uniqueId (which resets on page load, generating colliding keys like chat-conversation-1) with timestamp+random IDs. Fixed messageList memo mutating items in place — now returns new objects via spread and handles both unix-number and Date timestamps safely.",
+    "files": [
+      "src/app/(protected-pages)/concepts/chat/_components/ChatBody.jsx"
+    ]
+  },
+  {
+    "version": "1.9.8",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Chat and Mail fully wired to Prisma/MongoDB. Replaced all mock data with real DB queries. Chat: personal + group conversations with Users and Customers as contacts, message persistence, new conversation creation, contact details drawer with group member support. Mail: threaded mail with nested messages, category/label filtering (inbox/sent/draft/starred/deleted), star/flag/move/delete actions persisted to DB, compose and send mail via API. Updated Prisma schema: replaced flat MailMessage with MailThread + MailThreadMessage models, enhanced ChatConversation with chatType/avatar, enhanced ChatMessage with senderName/senderAvatar/attachments. Seed script for 6 conversations and 9 mail threads.",
+    "files": [
+      "prisma/schema.prisma",
+      "prisma/seed-chat-mail.js",
+      "src/app/api/chat/route.js",
+      "src/app/api/chat/[id]/route.js",
+      "src/app/api/mail/route.js",
+      "src/app/api/mail/[id]/route.js",
+      "src/app/api/contacts/route.js",
+      "src/app/api/contacts/[id]/route.js",
+      "src/app/api/conversations/[id]/route.js",
+      "src/server/actions/getChatList.js",
+      "src/server/actions/getMail.js",
+      "src/server/actions/getMailList.js",
+      "src/services/ChatService.js",
+      "src/app/(protected-pages)/concepts/chat/_components/ChatBody.jsx",
+      "src/app/(protected-pages)/concepts/chat/_components/NewChat.jsx",
+      "src/app/(protected-pages)/concepts/mail/_components/MailEditor.jsx",
+      "src/app/(protected-pages)/concepts/mail/_hooks/useMailAction.js"
+    ]
+  },
+  {
+    "version": "1.9.7",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Seeded 10 test customers and 20 invoices (spread across 6 months, mixed statuses/countries) for dashboard testing. Added Edit User dialog to Roles & Permissions — click pencil icon to edit name, email, password, phone, title, role, and status. New editUser API action on /api/roles/users.",
+    "files": [
+      "prisma/seed-test-data.js",
+      "src/app/api/roles/users/route.js",
+      "src/app/(protected-pages)/concepts/account/roles-permissions/_components/RolesPermissionsUserTable.jsx"
+    ]
+  },
+  {
+    "version": "1.9.6",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Customer form fixes: image upload now goes to DO Spaces (not blob URL), phone number + dial code saved to DB, password field added, location field removed (redundant with address), delivery address section added with separate fields. Customer detail billing tab: addresses now editable inline with save to API. Invoice dashboard: period filter now changes all stat cards + summary + recent invoices (not just chart). Added previous-period comparison with +/- % badges (green/red/orange) on all stat cards, summary rows, and amounts section. Prisma schema updated with dialCode, password, delivery address fields on Customer.",
+    "files": [
+      "prisma/schema.prisma",
+      "src/app/api/customers/route.js",
+      "src/app/api/customers/[id]/route.js",
+      "src/app/api/invoices/route.js",
+      "src/app/api/invoices/stats/route.js",
+      "src/server/actions/getCustomer.js",
+      "src/components/view/CustomerForm/CustomerForm.jsx",
+      "src/components/view/CustomerForm/PersonalInfoSection.jsx",
+      "src/components/view/CustomerForm/ProfileImageSection.jsx",
+      "src/components/view/CustomerForm/DeliveryAddressSection.jsx",
+      "src/components/view/CustomerForm/OverviewSection.jsx",
+      "src/app/(protected-pages)/concepts/customers/customer-edit/[id]/_components/CustomerEdit.jsx",
+      "src/app/(protected-pages)/concepts/customers/customer-create/_components/CustomerCreate.jsx",
+      "src/app/(protected-pages)/concepts/customers/customer-details/[id]/_components/BillingSection.jsx",
+      "src/app/(protected-pages)/concepts/customers/customer-details/[id]/_components/InvoicesSection.jsx",
+      "src/app/(protected-pages)/concepts/invoices/invoice-dashboard/page.jsx"
+    ]
+  },
+  {
+    "version": "1.9.5",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Customer detail page: added Invoices tab (default) showing all invoices for the customer with summary cards (total/paid/unpaid/amount), status badges, payment method, and view button. Fixed delete handler in ProfileSection to actually call DELETE API instead of just navigating away. Invoices API now supports customerId query param for filtering.",
+    "files": [
+      "src/app/(protected-pages)/concepts/customers/customer-details/[id]/_components/CustomerDetails.jsx",
+      "src/app/(protected-pages)/concepts/customers/customer-details/[id]/_components/InvoicesSection.jsx",
+      "src/app/(protected-pages)/concepts/customers/customer-details/[id]/_components/ProfileSection.jsx",
+      "src/app/api/invoices/route.js"
+    ]
+  },
+  {
+    "version": "1.9.4",
+    "date": "2026-03-21",
+    "type": "update",
+    "message": "Moved all logo and favicon URLs to env vars (NEXT_PUBLIC_LOGO_LIGHT, NEXT_PUBLIC_LOGO_DARK, NEXT_PUBLIC_FAVICON). Logo component, NavigationBar, LandingFooter, invoice detail PDF, and page-meta favicon all read from .env. No more hardcoded CDN URLs in source — swap branding by editing .env only.",
+    "files": [
+      ".env",
+      ".env.example",
+      "src/components/template/Logo.jsx",
+      "src/configs/page-meta.config.js",
+      "src/app/(public-pages)/landing/components/LandingFooter.jsx",
+      "src/app/(public-pages)/landing/components/NavigationBar.jsx",
+      "src/app/(protected-pages)/concepts/invoices/invoice-detail/[id]/page.jsx"
+    ]
+  },
+  {
+    "version": "1.9.3",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Invoice dashboard: added period filter (Today/Week/Month/Quarter/Year) and Top Countries section with world map, country flags, and progress bars. Customer list table now shows Invoices Paid and Invoices Unpaid columns with counts and totals. Invoice PDF: fixed broken logo by converting SVG to base64 data URI, improved layout with status badge, alternating row colors, dark TTC bar, structured Bill To/From sections, and clean legal footer. Invoice form: drag-to-reorder items via @hello-pangea/dnd with grip handles. All invoice labels switched to English.",
+    "files": [
+      "src/app/api/invoices/stats/route.js",
+      "src/app/(protected-pages)/concepts/invoices/invoice-dashboard/page.jsx",
+      "src/app/(protected-pages)/concepts/invoices/invoice-detail/[id]/page.jsx",
+      "src/app/(protected-pages)/concepts/invoices/_components/InvoiceForm.jsx",
+      "src/app/(protected-pages)/concepts/customers/customer-list/_components/CustomerListTable.jsx",
+      "src/server/actions/getCustomers.js"
+    ]
+  },
+  {
+    "version": "1.9.2",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Completed invoice dashboard page matching ecommerce dashboard design. Overview card with 3 clickable stat cards (Outstanding/Overdue/Paid) that switch the line chart series. Right sidebar: Payment Target with circular progress, Summary with icon list and counts, Amounts breakdown with percentage bars and icon grid. Bottom: Recent Invoices table with status badges, client names, and amounts via @tanstack/react-table. Fixed API param mismatch (sortKey/order) and customer name resolution in table.",
+    "files": [
+      "src/app/(protected-pages)/concepts/invoices/invoice-dashboard/page.jsx"
+    ]
+  },
+  {
+    "version": "1.9.1",
+    "date": "2026-03-21",
+    "type": "update",
+    "message": "Redesigned invoice dashboard to match ecommerce dashboard layout exactly. Uses same Card, StatisticCard, Progress, Badge, NumericFormat, @tanstack/react-table components. Left column: overview stat cards + status breakdown with progress bars. Right sidebar: payment target with circular progress, summary counts list, amount breakdown with percentage bars and icon grid. Bottom: recent invoices table.",
+    "files": [
+      "src/app/(protected-pages)/concepts/invoices/invoice-dashboard/page.jsx"
+    ]
+  },
+  {
+    "version": "1.9.0",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Invoice module enhancements: payment tracking (method, amount, date) on form and detail view. List table with sortable columns, checkbox selection, bulk delete/open. Recurring invoices auto-create next draft when marked paid. Invoice dashboard page with stat cards (outstanding, overdue, paid), status overview with progress bars for factures and devis. New API endpoints: /api/invoices/stats, /api/invoices/bulk. Prisma schema updated with paymentMethod, paymentAmount, paymentDate fields.",
+    "files": [
+      "prisma/schema.prisma",
+      "src/app/api/invoices/route.js",
+      "src/app/api/invoices/[id]/route.js",
+      "src/app/api/invoices/stats/route.js",
+      "src/app/api/invoices/bulk/route.js",
+      "src/app/(protected-pages)/concepts/invoices/_components/InvoiceForm.jsx",
+      "src/app/(protected-pages)/concepts/invoices/invoice-list/_components/InvoiceList.jsx",
+      "src/app/(protected-pages)/concepts/invoices/invoice-detail/[id]/page.jsx",
+      "src/app/(protected-pages)/concepts/invoices/invoice-dashboard/page.jsx",
+      "src/configs/navigation.config/concepts.navigation.config.js",
+      "src/configs/routes.config/conceptsRoute.js",
+      "messages/en.json",
+      "messages/ar.json",
+      "messages/es.json",
+      "messages/zh.json"
+    ]
+  },
+  {
+    "version": "1.8.1",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Fixed invoice detail page parse error (truncated file at line 45). Rewrote complete file and cleared stale Turbopack cache.",
+    "files": [
+      "src/app/(protected-pages)/concepts/invoices/invoice-detail/[id]/page.jsx"
+    ]
+  },
+  {
+    "version": "1.8.0",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Invoice & Devis module redesigned with professional TRT Digital branded template. Auto-numbering FA-NNN/MM/YYYY with number decrement on delete. Recurring invoice toggle (monthly/yearly, 1-12 cycles or infinite). Professional detail page with company info (RC/IF/CNSS/ICE/TP), styled items table with dark header, Total HT/TVA/Total TTC, total in French words (numberToFrenchWords utility). PDF download via html2pdf.js. French labels throughout. InvoiceForm with recurring options, unit field per item. InvoiceList with type/status filters, recurring badge.",
+    "files": [
+      "prisma/schema.prisma",
+      "src/app/api/invoices/route.js",
+      "src/app/api/invoices/[id]/route.js",
+      "src/services/InvoiceService.js",
+      "src/utils/numberToWords.js",
+      "src/app/(protected-pages)/concepts/invoices/_components/InvoiceForm.jsx",
+      "src/app/(protected-pages)/concepts/invoices/invoice-list/_components/InvoiceList.jsx",
+      "src/app/(protected-pages)/concepts/invoices/invoice-detail/[id]/page.jsx",
+      "src/app/(protected-pages)/concepts/invoices/invoice-edit/[id]/page.jsx",
+      "src/app/(protected-pages)/concepts/invoices/invoice-create/page.jsx"
+    ]
+  },
+  {
+    "version": "1.7.1",
+    "date": "2026-03-21",
+    "type": "fix",
+    "message": "Added missing i18n translation keys for Invoice nav items (conceptsInvoices) across all 4 locale files (en, ar, es, zh). Fixes MISSING_MESSAGE console errors for nav.conceptsInvoices.*.",
+    "files": [
+      "messages/en.json",
+      "messages/ar.json",
+      "messages/es.json",
+      "messages/zh.json"
+    ]
+  },
+  {
+    "version": "1.7.0",
+    "date": "2026-03-21",
+    "type": "feature",
+    "message": "Invoice & Devis module fully wired to Prisma/MongoDB. Full CRUD: list with filtering by status/type, create with auto-numbering (TRT-YYYY-NNN), edit, detail view with print support. Line items with quantity/unit price, auto-calculated subtotal/tax/total. Customer selector from DB. Currency support (MAD/EUR/USD). Tax rate configurable per invoice. Navigation and route config with RBAC (invoices.read/write permissions). Default roles updated with invoices access. ProductService CRUD functions added. ProductEdit field mapping fixed (sku→productCode, images→imgList). ProductForm validation relaxed for optional fields.",
+    "files": [
+      "src/app/api/invoices/route.js",
+      "src/app/api/invoices/[id]/route.js",
+      "src/services/InvoiceService.js",
+      "src/services/ProductService.js",
+      "src/app/(protected-pages)/concepts/invoices/invoice-list/page.jsx",
+      "src/app/(protected-pages)/concepts/invoices/invoice-list/_components/InvoiceList.jsx",
+      "src/app/(protected-pages)/concepts/invoices/invoice-create/page.jsx",
+      "src/app/(protected-pages)/concepts/invoices/_components/InvoiceForm.jsx",
+      "src/app/(protected-pages)/concepts/invoices/invoice-edit/[id]/page.jsx",
+      "src/app/(protected-pages)/concepts/invoices/invoice-detail/[id]/page.jsx",
+      "src/configs/navigation.config/concepts.navigation.config.js",
+      "src/configs/routes.config/conceptsRoute.js",
+      "src/constants/roles.constant.js",
+      "src/components/view/ProductForm/ProductForm.jsx",
+      "src/app/(protected-pages)/concepts/products/product-edit/[id]/_components/ProductEdit.jsx"
+    ]
+  },
+  {
     "version": "1.6.0",
     "date": "2026-03-21",
     "type": "update",

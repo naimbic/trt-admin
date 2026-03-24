@@ -10,12 +10,17 @@ import MailDeleteConfimation from './MailDeleteConfimation'
 import classNames from '@/utils/classNames'
 import { useMailStore } from '../_store/mailStore'
 import useMailAction from '../_hooks/useMailAction'
+import useCurrentSession from '@/utils/hooks/useCurrentSession'
+import useAuthority from '@/utils/hooks/useAuthority'
 import { labelList } from '../constants'
 import isLastChild from '@/utils/isLastChild'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { TbStarFilled, TbTrash, TbStar, TbFlag } from 'react-icons/tb'
+import { TbStarFilled, TbTrash, TbStar, TbFlag, TbPaperclip } from 'react-icons/tb'
 
 const htmlReg = /(<([^>]+)>)/gi
+
+const hasAttachments = (mail) =>
+    mail.message?.some((m) => m.attachment?.length > 0)
 
 const { THead, Th, TBody, Tr, Td } = Table
 
@@ -38,6 +43,10 @@ const MailList = () => {
         onResetChecked,
         onMailDelete,
     } = useMailAction()
+
+    const { session } = useCurrentSession()
+    const userAuthority = session?.user?.authority || []
+    const canDelete = useAuthority(userAuthority, ['mail.delete'])
 
     const router = useRouter()
 
@@ -176,7 +185,7 @@ const MailList = () => {
                                                     >
                                                         <Checkbox
                                                             checked={
-                                                                mail.checked
+                                                                !!mail.checked
                                                             }
                                                         />
                                                     </div>
@@ -208,10 +217,15 @@ const MailList = () => {
                                             </div>
                                         </Td>
                                         <Td className="max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
-                                            {renderSubject(
-                                                mail.title,
-                                                mail.message[0].content,
-                                            )}
+                                            <div className="flex items-center gap-2">
+                                                {hasAttachments(mail) && (
+                                                    <TbPaperclip className="text-gray-400 flex-shrink-0" title="Has attachments" />
+                                                )}
+                                                {renderSubject(
+                                                    mail.title,
+                                                    mail.message[0].content,
+                                                )}
+                                            </div>
                                         </Td>
                                         <Td>{mail.message[0].date}</Td>
                                         <Td>
@@ -251,22 +265,24 @@ const MailList = () => {
                                                         <TbStar />
                                                     )}
                                                 </button>
-                                                <button
-                                                    type="button"
-                                                    title="Delete"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation()
-                                                        setDeleteConfirmationOpen(
-                                                            {
-                                                                open: true,
-                                                                selected:
-                                                                    mail.id,
-                                                            },
-                                                        )
-                                                    }}
-                                                >
-                                                    <TbTrash />
-                                                </button>
+                                                {canDelete && (
+                                                    <button
+                                                        type="button"
+                                                        title="Delete"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            setDeleteConfirmationOpen(
+                                                                {
+                                                                    open: true,
+                                                                    selected:
+                                                                        mail.id,
+                                                                },
+                                                            )
+                                                        }}
+                                                    >
+                                                        <TbTrash />
+                                                    </button>
+                                                )}
                                             </div>
                                         </Td>
                                     </Tr>
@@ -313,14 +329,17 @@ const MailList = () => {
                                                     }
                                                 >
                                                     <Checkbox
-                                                        checked={mail.checked}
+                                                        checked={!!mail.checked}
                                                     />
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                            <div className="font-bold heading-text truncate">
+                                            <div className="font-bold heading-text truncate flex items-center gap-1">
                                                 {mail.name}
+                                                {hasAttachments(mail) && (
+                                                    <TbPaperclip className="text-gray-400 flex-shrink-0 text-sm" title="Has attachments" />
+                                                )}
                                             </div>
                                             <div className="min-w-0">
                                                 <div className="text-nowrap truncate">
@@ -366,22 +385,24 @@ const MailList = () => {
                                                         <TbStar />
                                                     )}
                                                 </button>
-                                                <button
-                                                    type="button"
-                                                    title="Delete"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation()
-                                                        setDeleteConfirmationOpen(
-                                                            {
-                                                                open: true,
-                                                                selected:
-                                                                    mail.id,
-                                                            },
-                                                        )
-                                                    }}
-                                                >
-                                                    <TbTrash />
-                                                </button>
+                                                {canDelete && (
+                                                    <button
+                                                        type="button"
+                                                        title="Delete"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            setDeleteConfirmationOpen(
+                                                                {
+                                                                    open: true,
+                                                                    selected:
+                                                                        mail.id,
+                                                                },
+                                                            )
+                                                        }}
+                                                    >
+                                                        <TbTrash />
+                                                    </button>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

@@ -162,7 +162,10 @@ const ChatList = () => {
                                                     .format('hh:mm A')}
                                             </small>
                                             {item.unread > 0 && (
-                                                <Badge className="bg-primary" />
+                                                <Badge
+                                                    className="bg-primary text-white min-w-[20px] h-[20px] flex items-center justify-center rounded-full text-xs font-bold"
+                                                    content={item.unread}
+                                                />
                                             )}
                                         </div>
                                     </div>

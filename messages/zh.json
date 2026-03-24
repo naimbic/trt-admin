@@ -64,6 +64,16 @@
             "orderCreateDesc": "创建新订单",
             "orderDetailsDesc": "订单详细信息"
         },
+        "conceptsInvoices": {
+            "invoices": "发票",
+            "invoiceDashboard": "仪表板",
+            "invoiceDashboardDesc": "发票统计概览",
+            "invoiceList": "列表",
+            "invoiceCreate": "新建发票",
+            "invoicesDesc": "发票与报价管理",
+            "invoiceListDesc": "查看所有发票与报价",
+            "invoiceCreateDesc": "创建发票或报价"
+        },
         "conceptsAccount": {
             "account": "账户",
             "settings": "设置",

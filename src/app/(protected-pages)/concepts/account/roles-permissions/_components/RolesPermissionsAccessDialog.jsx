@@ -23,11 +23,19 @@ import {
     TbFiles,
     TbFileChart,
     TbCheck,
+    TbMessageCircle,
+    TbMail,
+    TbFileInvoice,
+    TbUsers,
 } from 'react-icons/tb'
 
 const moduleIcon = {
     users: <TbUserCog />,
+    customers: <TbUsers />,
     products: <TbBox />,
+    invoices: <TbFileInvoice />,
+    chat: <TbMessageCircle />,
+    mail: <TbMail />,
     configurations: <TbSettings />,
     files: <TbFiles />,
     reports: <TbFileChart />,

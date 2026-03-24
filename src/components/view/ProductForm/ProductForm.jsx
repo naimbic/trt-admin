@@ -15,23 +15,14 @@ import isEmpty from 'lodash/isEmpty'
 const validationSchema = z.object({
     name: z.string().min(1, { message: "Product name required!" }),
     productCode: z.string().min(1, { message: "Product code required!" }),
-    description: z.string().min(1, { message: "Product description required!" }),
+    description: z.string().optional().default(''),
     price: z.union([z.string(), z.number()])
         .refine((val) => val !== "" && val !== null && val !== undefined, {
         message: "Price required!",
         }),
-    taxRate: z.union([z.string(), z.number()])
-        .refine((val) => val !== "" && val !== null && val !== undefined, {
-        message: "Tax rate required!",
-        }),
-    costPerItem: z.union([z.string(), z.number()])
-        .refine((val) => val !== "" && val !== null && val !== undefined, {
-        message: "Cost required!",
-        }),
-    bulkDiscountPrice: z.union([z.string(), z.number()])
-        .refine((val) => val !== "" && val !== null && val !== undefined, {
-        message: "Bulk discount price required!",
-        }),
+    taxRate: z.union([z.string(), z.number()]).optional().default(0),
+    costPerItem: z.union([z.string(), z.number()]).optional().default(''),
+    bulkDiscountPrice: z.union([z.string(), z.number()]).optional().default(''),
     imgList: z
         .array(
         z.object({
@@ -40,8 +31,9 @@ const validationSchema = z.object({
             img: z.string(),
         })
         )
-        .min(1, { message: "At least 1 image required!" }),
-    category: z.string().min(1, { message: "Product category required!" }),
+        .optional()
+        .default([]),
+    category: z.string().optional().default(''),
 });
 const ProductForm = (props) => {
     const {

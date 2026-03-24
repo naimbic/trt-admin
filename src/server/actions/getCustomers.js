@@ -38,6 +38,28 @@ const getCustomers = async (_queryParams) => {
         prisma.customer.count({ where }),
     ])
 
+    // Fetch invoice counts per customer
+    const customerIds = customers.map(c => c.id)
+    const invoices = customerIds.length
+        ? await prisma.invoice.findMany({
+              where: { customerId: { in: customerIds }, type: 'invoice' },
+              select: { customerId: true, status: true, total: true },
+          })
+        : []
+
+    const invoiceMap = {}
+    invoices.forEach(inv => {
+        if (!inv.customerId) return
+        if (!invoiceMap[inv.customerId]) invoiceMap[inv.customerId] = { paid: 0, unpaid: 0, totalPaid: 0, totalUnpaid: 0 }
+        if (inv.status === 'paid') {
+            invoiceMap[inv.customerId].paid += 1
+            invoiceMap[inv.customerId].totalPaid += inv.total || 0
+        } else if (inv.status !== 'cancelled') {
+            invoiceMap[inv.customerId].unpaid += 1
+            invoiceMap[inv.customerId].totalUnpaid += inv.total || 0
+        }
+    })
+
     const list = customers.map((c) => ({
         id: c.id,
         name: `${c.firstName} ${c.lastName}`,
@@ -53,6 +75,7 @@ const getCustomers = async (_queryParams) => {
             country: c.country,
             phone: c.phone,
         },
+        invoices: invoiceMap[c.id] || { paid: 0, unpaid: 0, totalPaid: 0, totalUnpaid: 0 },
     }))
 
     return { list, total }

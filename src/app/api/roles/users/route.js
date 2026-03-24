@@ -39,6 +39,8 @@ export async function GET(request) {
                 role: true,
                 status: true,
                 lastOnline: true,
+                phone: true,
+                title: true,
             },
             orderBy,
             skip: (pageIndex - 1) * pageSize,
@@ -53,6 +55,8 @@ export async function GET(request) {
             role: u.role || 'user',
             status: u.status || 'active',
             lastOnline: u.lastOnline || Math.floor(Date.now() / 1000),
+            phone: u.phone || '',
+            title: u.title || '',
         }))
 
         return NextResponse.json({ list, total })
@@ -116,6 +120,28 @@ export async function PUT(request) {
                 success: true,
                 data: { id: user.id },
             })
+        }
+
+        if (action === 'editUser') {
+            const updateData = {}
+            if (body.name) updateData.name = body.name
+            if (body.email) updateData.email = body.email
+            if (body.phone !== undefined) updateData.phone = body.phone || null
+            if (body.title !== undefined) updateData.title = body.title || null
+            if (body.role) {
+                updateData.role = body.role
+                updateData.authority = [body.role]
+            }
+            if (body.status) updateData.status = body.status
+            if (body.password) {
+                const bcrypt = await import('bcryptjs')
+                updateData.password = await bcrypt.default.hash(body.password, 10)
+            }
+            await prisma.user.update({
+                where: { id: body.userId },
+                data: updateData,
+            })
+            return NextResponse.json({ success: true })
         }
 
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 })

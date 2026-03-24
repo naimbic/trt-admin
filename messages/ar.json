@@ -64,6 +64,16 @@
             "orderCreateDesc": "إنشاء طلب جديد",
             "orderDetailsDesc": "معلومات مفصلة عن الطلب"
         },
+        "conceptsInvoices": {
+            "invoices": "الفواتير",
+            "invoiceDashboard": "لوحة القيادة",
+            "invoiceDashboardDesc": "نظرة عامة على إحصائيات الفواتير",
+            "invoiceList": "القائمة",
+            "invoiceCreate": "فاتورة جديدة",
+            "invoicesDesc": "إدارة الفواتير وعروض الأسعار",
+            "invoiceListDesc": "عرض جميع الفواتير وعروض الأسعار",
+            "invoiceCreateDesc": "إنشاء فاتورة أو عرض سعر"
+        },
         "conceptsAccount": {
             "account": "الحساب",
             "settings": "الإعدادات",

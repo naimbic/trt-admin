@@ -6,7 +6,6 @@ import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import ProductForm from '@/components/view/ProductForm'
-import sleep from '@/utils/sleep'
 import { TbTrash, TbArrowNarrowLeft } from 'react-icons/tb'
 import { useRouter } from 'next/navigation'
 
@@ -19,31 +18,26 @@ const ProductEdit = ({ data }) => {
 
     const getDefaultValues = () => {
         if (data) {
-            const {
-                name,
-                description,
-                productCode,
-                taxRate,
-                price,
-                bulkDiscountPrice,
-                costPerItem,
-                imgList,
-                category,
-                brand,
-            } = data
-
             return {
-                name,
-                description,
-                productCode,
-                taxRate,
-                price,
-                bulkDiscountPrice,
-                costPerItem,
-                imgList,
-                category,
-                tags: [{ label: 'trend', value: 'trend' }],
-                brand,
+                name: data.name || '',
+                description: data.description || '',
+                productCode: data.sku || '',
+                taxRate: data.taxRate ?? 0,
+                price: data.price ?? '',
+                bulkDiscountPrice: data.bulkDiscountPrice ?? '',
+                costPerItem: data.costPerItem ?? '',
+                imgList: Array.isArray(data.images)
+                    ? data.images.map((url, i) => ({
+                          id: `img-${i}`,
+                          name: url.split('/').pop() || `image-${i}`,
+                          img: url,
+                      }))
+                    : [],
+                category: data.category || '',
+                tags: Array.isArray(data.tags)
+                    ? data.tags.map((t) => ({ label: t, value: t }))
+                    : [],
+                brand: data.brand || '',
             }
         }
 
@@ -51,14 +45,30 @@ const ProductEdit = ({ data }) => {
     }
 
     const handleFormSubmit = async (values) => {
-        console.log('Submitted values', values)
         setIsSubmiting(true)
-        await sleep(800)
-        setIsSubmiting(false)
-        toast.push(<Notification type="success">Changes Saved!</Notification>, {
-            placement: 'top-center',
-        })
-        router.push('/concepts/products/product-list')
+        try {
+            const res = await fetch(`/api/products/${data.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(values),
+            })
+            const json = await res.json()
+            if (!res.ok) {
+                throw new Error(json.error || 'Failed to save product')
+            }
+            toast.push(
+                <Notification type="success">Changes Saved!</Notification>,
+                { placement: 'top-center' },
+            )
+            router.push('/concepts/products/product-list')
+        } catch (err) {
+            toast.push(
+                <Notification type="danger">{err.message}</Notification>,
+                { placement: 'top-center' },
+            )
+        } finally {
+            setIsSubmiting(false)
+        }
     }
 
     const handleDelete = () => {
@@ -73,13 +83,25 @@ const ProductEdit = ({ data }) => {
         router.push('/concepts/products/product-list')
     }
 
-    const handleConfirmDelete = () => {
-        setDeleteConfirmationOpen(true)
-        toast.push(
-            <Notification type="success">Product deleted!</Notification>,
-            { placement: 'top-center' },
-        )
-        router.push('/concepts/products/product-list')
+    const handleConfirmDelete = async () => {
+        try {
+            const res = await fetch(`/api/products/${data.id}`, { method: 'DELETE' })
+            const json = await res.json()
+            if (!res.ok) {
+                throw new Error(json.error || 'Failed to delete product')
+            }
+            setDeleteConfirmationOpen(false)
+            toast.push(
+                <Notification type="success">Product deleted!</Notification>,
+                { placement: 'top-center' },
+            )
+            router.push('/concepts/products/product-list')
+        } catch (err) {
+            toast.push(
+                <Notification type="danger">{err.message}</Notification>,
+                { placement: 'top-center' },
+            )
+        }
     }
 
     return (

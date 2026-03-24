@@ -14,6 +14,18 @@ const useMailAction = () => {
         setMailList(newMailList)
     }
 
+    const persistUpdate = async (id, data) => {
+        try {
+            await fetch(`/api/mail/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            })
+        } catch (err) {
+            console.error('Failed to update mail:', err)
+        }
+    }
+
     const onStarToggle = (mail, shouldSetMail = true) => {
         const newMail = cloneDeep(mail)
         newMail.starred = !newMail.starred
@@ -21,6 +33,7 @@ const useMailAction = () => {
             setMail(newMail)
         }
         updateMailList(newMail)
+        persistUpdate(mail.id, { starred: newMail.starred })
     }
 
     const onFlagToggle = (mail, shouldSetMail = true) => {
@@ -30,6 +43,7 @@ const useMailAction = () => {
             setMail(newMail)
         }
         updateMailList(newMail)
+        persistUpdate(mail.id, { flagged: newMail.flagged })
     }
 
     const onCheckboxToggle = (mail) => {
@@ -42,6 +56,7 @@ const useMailAction = () => {
         const newMail = cloneDeep(mail)
         newMail.label = destination
         updateMailList(newMail)
+        persistUpdate(mail.id, { label: destination })
     }
 
     const onBatchMoveMailClick = (mailsId, destination) => {
@@ -50,17 +65,36 @@ const useMailAction = () => {
                 if (mailsId.includes(mail.id)) {
                     mail.label = destination
                     mail.checked = false
+                    persistUpdate(mail.id, { label: destination })
                 }
-
                 return mail
             }),
         )
         setSelectedMail([])
     }
 
-    const onMailDelete = (mailsId) => {
+    const onMailDelete = async (mailsId) => {
+        // Separate mails already in deleted folder from others
+        const toHardDelete = mailList.filter((m) => mailsId.includes(m.id) && m.group === 'deleted')
+        const toSoftDelete = mailList.filter((m) => mailsId.includes(m.id) && m.group !== 'deleted')
+
+        // Remove all from UI
         setMailList(mailList.filter((mail) => !mailsId.includes(mail.id)))
         setSelectedMail([])
+
+        // Hard-delete mails already in Deleted folder
+        for (const mail of toHardDelete) {
+            try {
+                await fetch(`/api/mail/${mail.id}`, { method: 'DELETE' })
+            } catch (err) {
+                console.error('Failed to hard-delete mail:', err)
+            }
+        }
+
+        // Move others to deleted folder
+        for (const mail of toSoftDelete) {
+            persistUpdate(mail.id, { group: 'deleted' })
+        }
     }
 
     const onResetChecked = () => {

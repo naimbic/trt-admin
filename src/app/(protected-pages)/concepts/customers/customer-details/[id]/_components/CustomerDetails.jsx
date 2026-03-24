@@ -4,6 +4,7 @@ import Tabs from '@/components/ui/Tabs'
 import ProfileSection from './ProfileSection'
 import BillingSection from './BillingSection'
 import ActivitySection from './ActivitySection'
+import InvoicesSection from './InvoicesSection'
 
 const { TabNav, TabList, TabContent } = Tabs
 
@@ -14,12 +15,16 @@ const CustomerDetails = ({ data }) => {
                 <ProfileSection data={data} />
             </div>
             <Card className="w-full">
-                <Tabs defaultValue="billing">
+                <Tabs defaultValue="invoices">
                     <TabList>
+                        <TabNav value="invoices">Invoices</TabNav>
                         <TabNav value="billing">Billing</TabNav>
                         <TabNav value="activity">Activity</TabNav>
                     </TabList>
                     <div className="p-4">
+                        <TabContent value="invoices">
+                            <InvoicesSection customerId={data.id} />
+                        </TabContent>
                         <TabContent value="billing">
                             <BillingSection data={data} />
                         </TabContent>

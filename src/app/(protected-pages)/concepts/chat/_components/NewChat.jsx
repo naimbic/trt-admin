@@ -7,7 +7,8 @@ import ScrollBar from '@/components/ui/ScrollBar'
 import Spinner from '@/components/ui/Spinner'
 import DebouceInput from '@/components/shared/DebouceInput'
 import classNames from '@/utils/classNames'
-import { apiGetContacts } from '@/services/ChatService'
+import { apiGetContacts, apiCreateConversation } from '@/services/ChatService'
+import { useChatStore } from '../_store/chatStore'
 import { TbSearch, TbCheck } from 'react-icons/tb'
 import useSWRMutation from 'swr/mutation'
 
@@ -55,7 +56,67 @@ const NewChat = () => {
         setSelectedContact([])
     }
 
-    const handleStartNewChat = () => {
+    const setChats = useChatStore((state) => state.setChats)
+    const chats = useChatStore((state) => state.chats)
+    const setSelectedChat = useChatStore((state) => state.setSelectedChat)
+    const setSelectedChatType = useChatStore((state) => state.setSelectedChatType)
+    const setMobileSidebar = useChatStore((state) => state.setMobileSidebar)
+
+    const handleStartNewChat = async () => {
+        if (selectedContact.length === 0) return
+
+        const chatType = selectedContact.length > 1 ? 'groups' : 'personal'
+        const participantIds = selectedContact.map((c) => c.id)
+
+        try {
+            const resp = await apiCreateConversation({
+                participantIds,
+                chatType,
+                name: chatType === 'groups' ? selectedContact.map((c) => c.name).join(', ') : undefined,
+            })
+
+            if (resp?.id) {
+                const contact = selectedContact[0]
+                const newChat = {
+                    id: resp.id,
+                    name: chatType === 'groups'
+                        ? selectedContact.map((c) => c.name).join(', ')
+                        : contact.name,
+                    userId: chatType === 'personal' ? contact.id : undefined,
+                    groupId: chatType === 'groups' ? resp.id : undefined,
+                    avatar: contact.img || '/img/avatars/thumb-1.jpg',
+                    unread: 0,
+                    time: Math.floor(Date.now() / 1000),
+                    lastConversation: '',
+                    chatType,
+                    muted: false,
+                }
+
+                if (!resp.existing) {
+                    setChats([newChat, ...chats])
+                }
+
+                // Switch to the correct tab so the new chat is visible
+                setSelectedChatType(chatType)
+
+                setSelectedChat({
+                    id: resp.id,
+                    user: {
+                        id: chatType === 'groups' ? resp.id : contact.id,
+                        avatarImageUrl: contact.img || '/img/avatars/thumb-1.jpg',
+                        name: chatType === 'groups'
+                            ? selectedContact.map((c) => c.name).join(', ')
+                            : contact.name,
+                    },
+                    muted: false,
+                    chatType,
+                })
+                setMobileSidebar(false)
+            }
+        } catch (err) {
+            console.error('Failed to create conversation:', err)
+        }
+
         handleDialogClose()
     }
 

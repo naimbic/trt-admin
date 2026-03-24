@@ -2,22 +2,22 @@
   {
     "id": "TASK-001",
     "title": "Wire remaining dashboard server actions to Prisma",
-    "description": "getEcommerceDashboard, getProjectDashboard, getMarketingDashboard, getAnalyticDashboard still import from mock data. Replace with real Prisma aggregation queries.",
-    "status": "todo",
+    "description": "getAnalyticDashboard fully working — fixed null dates in 8,750 PageEvent records (copied createdAt→date). Dashboard shows real views/likes/shares with period filtering. Remaining: getEcommerceDashboard, getProjectDashboard, getMarketingDashboard still import from mock data.",
+    "status": "in-progress",
     "priority": "critical",
     "phase": 2,
     "files": [
+      "src/server/actions/getAnalyticDashboard.js",
       "src/server/actions/getEcommerceDashboard.js",
       "src/server/actions/getProjectDashboard.js",
-      "src/server/actions/getMarketingDashboard.js",
-      "src/server/actions/getAnalyticDashboard.js"
+      "src/server/actions/getMarketingDashboard.js"
     ]
   },
   {
     "id": "TASK-002",
     "title": "Wire chat, mail, calendar, scrumboard to Prisma",
-    "description": "getChatList, getChatHistory, getMail, getMailList, getCalendar, getScrumboardData still use mock data.",
-    "status": "todo",
+    "description": "Chat and Mail fully wired to Prisma with full CRUD, contacts from Users+Customers, seed data, file attachments in mail, label move fix. Remaining: getCalendar, getScrumboardData still use mock data.",
+    "status": "in-progress",
     "priority": "high",
     "phase": 2,
     "files": [
@@ -27,7 +27,14 @@
       "src/server/actions/getMailList.js",
       "src/server/actions/getCalendar.js",
       "src/server/actions/getScrumboardData.js",
-      "src/server/actions/getSrcumboardMembers.js"
+      "src/server/actions/getSrcumboardMembers.js",
+      "src/app/api/chat/route.js",
+      "src/app/api/chat/[id]/route.js",
+      "src/app/api/mail/route.js",
+      "src/app/api/mail/[id]/route.js",
+      "src/app/api/contacts/route.js",
+      "src/app/api/contacts/[id]/route.js",
+      "prisma/seed-chat-mail.js"
     ]
   },
   {
@@ -48,15 +55,17 @@
   {
     "id": "TASK-004",
     "title": "Add POST/PUT/DELETE API routes for all entities",
-    "description": "Currently only GET routes exist for customers, products, etc. Need full CRUD via REST for frontend integration.",
-    "status": "todo",
+    "description": "Full CRUD via REST for customers, products, invoices. Remaining: projects, contacts.",
+    "status": "in-progress",
     "priority": "critical",
     "phase": 2,
     "files": [
       "src/app/api/customers/route.js",
+      "src/app/api/customers/[id]/route.js",
       "src/app/api/products/route.js",
-      "src/app/api/projects/",
-      "src/app/api/contacts/"
+      "src/app/api/products/[id]/route.js",
+      "src/app/api/invoices/route.js",
+      "src/app/api/invoices/[id]/route.js"
     ]
   },
   {
@@ -80,14 +89,17 @@
   {
     "id": "TASK-007",
     "title": "TRT Maroc branding",
-    "description": "Replace logos, update color scheme, app name, meta tags, favicon. Customize login page.",
-    "status": "in-progress",
+    "description": "Logos, app name, meta tags, and favicon all replaced and driven by env vars (NEXT_PUBLIC_LOGO_LIGHT, NEXT_PUBLIC_LOGO_DARK, NEXT_PUBLIC_FAVICON). Logo component, landing pages, invoice PDF, and page-meta all read from env. Easy to swap by editing .env.",
+    "status": "done",
     "priority": "medium",
     "phase": 3,
     "files": [
-      "public/img/logo/",
-      "src/configs/app.config.js",
-      "src/configs/page-meta.config.js"
+      "src/components/template/Logo.jsx",
+      "src/configs/page-meta.config.js",
+      "src/app/(public-pages)/landing/components/LandingFooter.jsx",
+      "src/app/(public-pages)/landing/components/NavigationBar.jsx",
+      ".env",
+      ".env.example"
     ]
   },
   {
@@ -102,11 +114,11 @@
   {
     "id": "TASK-009",
     "title": "Invoice & Devis module",
-    "description": "Add Invoice model, list/create/edit/detail pages, PDF generation, quote management, numbering system (TRT-2026-001).",
-    "status": "todo",
+    "description": "Invoice/Devis fully redesigned with professional TRT Digital branded template. Auto-numbering FA-NNN/MM/YYYY with number decrement on delete. Recurring invoice toggle with auto-create next invoice on payment. Payment tracking (method, amount, date). List with sortable columns, bulk select/delete. Invoice dashboard with stat cards, period filtering (day/week/month/quarter/year), top countries map, and chart. PDF with base64 logo fix and improved layout. Drag-to-reorder items in form. Customer list shows paid/unpaid invoice counts. RBAC permissions (invoices.read/write/delete).",
+    "status": "done",
     "priority": "high",
     "phase": 4,
-    "files": ["prisma/schema.prisma"]
+    "files": ["prisma/schema.prisma", "src/app/api/invoices/route.js", "src/app/api/invoices/[id]/route.js", "src/services/InvoiceService.js", "src/app/(protected-pages)/concepts/invoices/"]
   },
   {
     "id": "TASK-010",
@@ -165,11 +177,40 @@
   {
     "id": "TASK-016",
     "title": "Integrate Google APIs (GA4 + Search Console + Indexing)",
-    "description": "Port google-apis.js utilities from frontend: fetchGA4Visitors, fetchKeywordPositions, fetchSearchTraffic, fetchTopPages, fetchDeviceBreakdown, fetchCountryBreakdown, fetchIndexedPages, requestIndexing.",
-    "status": "todo",
+    "description": "All Google API functions ported to src/lib/google-apis.js (GA4 visitors, SC keywords, search traffic, top pages, devices, countries, indexing). Server action getGoogleAnalytics.js fetches all in parallel. Analytics dashboard has 3 tabs: Analytics, Google, Indexing. POST /api/google/index-url for requesting indexing/removal. Requires 4 env vars to activate.",
+    "status": "done",
     "priority": "high",
     "phase": 5,
-    "files": []
+    "files": [
+      "src/lib/google-apis.js",
+      "src/server/actions/getGoogleAnalytics.js",
+      "src/app/api/google/index-url/route.js",
+      "src/app/(protected-pages)/dashboards/analytic/_components/TabGoogle.jsx",
+      "src/app/(protected-pages)/dashboards/analytic/_components/TabIndexing.jsx",
+      "src/app/(protected-pages)/dashboards/analytic/_components/AnalyticDashboard.jsx",
+      "src/app/(protected-pages)/dashboards/analytic/page.jsx"
+    ]
+  },
+  {
+    "id": "TASK-022",
+    "title": "Page Stats section, Indexing/Changelog pagination, Submissions & 404 API",
+    "description": "Added PageStats component with server-side pagination and sortable columns (views/likes/shares/AI). AI column sums aiClicks embedded object (chatgpt/gemini/claude/perplexity/grok) from PageStat. Added aiClicks Json field to Prisma schema. Indexing tab now has client-side pagination (15/page). Changelog API supports ?page&limit params, frontend uses Pagination component with tab switching fix. Created POST/GET /api/submissions, PATCH /api/submissions/:id, POST /api/404-log, GET /api/admin/errors with CORS, rate limiting, dedup, and admin auth.",
+    "status": "done",
+    "priority": "high",
+    "phase": 5,
+    "files": [
+      "src/server/actions/getPageStats.js",
+      "src/app/(protected-pages)/dashboards/analytic/_components/PageStats.jsx",
+      "src/app/(protected-pages)/dashboards/analytic/_components/AnalyticDashboard.jsx",
+      "src/app/(protected-pages)/dashboards/analytic/_components/TabIndexing.jsx",
+      "src/app/(protected-pages)/guide/changelog/page.jsx",
+      "src/app/api/changelog/route.js",
+      "src/app/api/submissions/route.js",
+      "src/app/api/submissions/[id]/route.js",
+      "src/app/api/404-log/route.js",
+      "src/app/api/admin/errors/route.js",
+      "src/lib/cors.js"
+    ]
   },
   {
     "id": "TASK-017",

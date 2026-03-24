@@ -64,6 +64,16 @@
             "orderCreateDesc": "Crear un nuevo pedido",
             "orderDetailsDesc": "Información detallada del pedido"
         },
+        "conceptsInvoices": {
+            "invoices": "Facturas",
+            "invoiceDashboard": "Panel",
+            "invoiceDashboardDesc": "Resumen de estadísticas de facturas",
+            "invoiceList": "Lista",
+            "invoiceCreate": "Nueva Factura",
+            "invoicesDesc": "Gestión de facturas y presupuestos",
+            "invoiceListDesc": "Ver todas las facturas y presupuestos",
+            "invoiceCreateDesc": "Crear factura o presupuesto"
+        },
         "conceptsAccount": {
             "account": "Cuenta",
             "settings": "Configuración",

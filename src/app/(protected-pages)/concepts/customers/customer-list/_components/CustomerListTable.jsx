@@ -118,6 +118,32 @@ const CustomerListTable = ({
                 },
             },
             {
+                header: 'Invoices Paid',
+                accessorKey: 'invoices.paid',
+                cell: (props) => {
+                    const inv = props.row.original.invoices
+                    return (
+                        <div>
+                            <span className="font-semibold text-emerald-500">{inv?.paid || 0}</span>
+                            {inv?.totalPaid > 0 && <span className="text-xs ml-1 text-gray-400">({inv.totalPaid.toFixed(0)} MAD)</span>}
+                        </div>
+                    )
+                },
+            },
+            {
+                header: 'Invoices Unpaid',
+                accessorKey: 'invoices.unpaid',
+                cell: (props) => {
+                    const inv = props.row.original.invoices
+                    return (
+                        <div>
+                            <span className="font-semibold text-red-500">{inv?.unpaid || 0}</span>
+                            {inv?.totalUnpaid > 0 && <span className="text-xs ml-1 text-gray-400">({inv.totalUnpaid.toFixed(0)} MAD)</span>}
+                        </div>
+                    )
+                },
+            },
+            {
                 header: 'Spent',
                 accessorKey: 'totalSpending',
                 cell: (props) => {

@@ -2,6 +2,8 @@
 import { useRef } from 'react'
 import Dropdown from '@/components/ui/Dropdown'
 import { useChatStore } from '../_store/chatStore'
+import useCurrentSession from '@/utils/hooks/useCurrentSession'
+import useAuthority from '@/utils/hooks/useAuthority'
 import {
     TbDotsVertical,
     TbBell,
@@ -19,6 +21,9 @@ const ChatAction = ({ muted }) => {
         (state) => state.deleteConversationRecord,
     )
     const setChatMute = useChatStore((state) => state.setChatMute)
+    const { session } = useCurrentSession()
+    const userAuthority = session?.user?.authority || []
+    const canDelete = useAuthority(userAuthority, ['chat.delete'])
 
     const handleMute = () => {
         const nextMuted = !selectedChat.muted
@@ -26,9 +31,14 @@ const ChatAction = ({ muted }) => {
         setChatMute({ id: selectedChat.id, muted: nextMuted })
     }
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
         deleteConversationRecord(selectedChat.id)
         setSelectedChat({})
+        try {
+            await fetch(`/api/chat/${selectedChat.id}`, { method: 'DELETE' })
+        } catch (err) {
+            console.error('Failed to delete conversation:', err)
+        }
     }
 
     return (
@@ -63,12 +73,14 @@ const ChatAction = ({ muted }) => {
                         <span>Share contact</span>
                     </Dropdown.Item>
                 )}
-                <Dropdown.Item eventKey="delete" onClick={handleDelete}>
-                    <span className="text-lg text-error">
-                        <TbTrash />
-                    </span>
-                    <span className="text-error">Delete</span>
-                </Dropdown.Item>
+                {canDelete && (
+                    <Dropdown.Item eventKey="delete" onClick={handleDelete}>
+                        <span className="text-lg text-error">
+                            <TbTrash />
+                        </span>
+                        <span className="text-error">Delete</span>
+                    </Dropdown.Item>
+                )}
             </Dropdown>
         </div>
     )

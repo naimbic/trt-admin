@@ -64,6 +64,16 @@
             "orderCreateDesc": "Create new order",
             "orderDetailsDesc": "Detailed order information"
         },
+        "conceptsInvoices": {
+            "invoices": "Invoices",
+            "invoiceDashboard": "Dashboard",
+            "invoiceDashboardDesc": "Invoice statistics overview",
+            "invoiceList": "List",
+            "invoiceCreate": "New Invoice",
+            "invoicesDesc": "Invoices & quotes management",
+            "invoiceListDesc": "View all invoices & devis",
+            "invoiceCreateDesc": "Create invoice or devis"
+        },
         "conceptsAccount": {
             "account": "Account",
             "settings": "Settings",

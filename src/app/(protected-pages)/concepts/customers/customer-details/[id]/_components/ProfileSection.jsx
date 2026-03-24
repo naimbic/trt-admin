@@ -43,14 +43,24 @@ const ProfileSection = ({ data = {} }) => {
         setDialogOpen(true)
     }
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
         setDialogOpen(false)
-        router.push('/concepts/customers/customer-list')
-        toast.push(
-            <Notification title={'Successfully Deleted'} type="success">
-                Customer successfuly deleted
-            </Notification>,
-        )
+        try {
+            const res = await fetch(`/api/customers/${data.id}`, { method: 'DELETE' })
+            if (!res.ok) throw new Error('Delete failed')
+            router.push('/concepts/customers/customer-list')
+            toast.push(
+                <Notification title={'Successfully Deleted'} type="success">
+                    Customer successfully deleted
+                </Notification>,
+            )
+        } catch {
+            toast.push(
+                <Notification title={'Error'} type="danger">
+                    Failed to delete customer
+                </Notification>,
+            )
+        }
     }
 
     const handleSendMessage = () => {

@@ -9,6 +9,15 @@ import crypto from 'crypto'
 const MAX_SIZE = 10 * 1024 * 1024 // 10MB
 const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif']
 
+// Dangerous file extensions that should never be uploaded
+const BLOCKED_EXTENSIONS = new Set([
+    'exe', 'bat', 'cmd', 'com', 'msi', 'scr', 'pif', 'vbs', 'vbe',
+    'js', 'jse', 'ws', 'wsf', 'wsc', 'wsh', 'ps1', 'ps2', 'psc1',
+    'psc2', 'reg', 'inf', 'lnk', 'sct', 'shb', 'shs', 'cpl', 'hta',
+    'dll', 'sys', 'drv', 'ocx', 'cgi', 'bin', 'app', 'action',
+    'command', 'workflow', 'sh', 'bash', 'csh', 'ksh', 'out', 'run',
+])
+
 // Resize limits per folder
 const SIZE_PRESETS = {
     avatars: { width: 256, height: 256, fit: 'cover' },
@@ -49,6 +58,12 @@ export async function POST(request) {
 
         if (file.size > MAX_SIZE) {
             return NextResponse.json({ error: 'File too large (max 10MB)' }, { status: 400 })
+        }
+
+        // Block dangerous file types
+        const fileExt = file.name.split('.').pop()?.toLowerCase() || ''
+        if (BLOCKED_EXTENSIONS.has(fileExt)) {
+            return NextResponse.json({ error: 'File type not allowed' }, { status: 400 })
         }
 
         const rawBuffer = Buffer.from(await file.arrayBuffer())

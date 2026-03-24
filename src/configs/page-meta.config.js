@@ -3,7 +3,7 @@ const pageMeta = {
     description:
         'Admin Template and Starter Kit with React, Tailwind Components and Next.js',
     icons: {
-        icon: '/favicon.ico',
+        icon: process.env.NEXT_PUBLIC_FAVICON || '/favicon.ico',
     },
 }
 
