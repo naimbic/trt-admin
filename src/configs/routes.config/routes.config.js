@@ -13,6 +13,11 @@ export const protectedRoutes = {
     ...guideRoute,
 }
 
-export const publicRoutes = {}
+export const publicRoutes = {
+    '/access-denied': {
+        key: 'accessDenied',
+        authority: [],
+    },
+}
 
 export const authRoutes = authRoute
