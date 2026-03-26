@@ -678,7 +678,7 @@ const guideRoute = {
     ...shareComponentDocRoute,
     ...utilsDocRoute,
     '/guide/changelog': {
-        key: 'guide.utilsDoc',
+        key: 'guide.changeLog',
         authority: [ADMIN, USER],
         meta: {
             pageBackgroundType: 'plain',

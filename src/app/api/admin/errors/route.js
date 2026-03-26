@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { auth } from '@/auth'
 
-// GET /api/admin/errors — list 404 logs (admin auth required)
+// GET /api/admin/errors — list 404 logs sorted by hitCount desc (admin auth required)
 export async function GET() {
     try {
         const session = await auth()
@@ -11,7 +11,7 @@ export async function GET() {
         }
 
         const errors = await prisma.errorLog.findMany({
-            orderBy: { date: 'desc' },
+            orderBy: { hitCount: 'desc' },
             take: 500,
         })
 

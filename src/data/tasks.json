@@ -213,6 +213,26 @@
     ]
   },
   {
+    "id": "TASK-023",
+    "title": "Redirects & 404 error management system",
+    "description": "Added Redirect model and updated ErrorLog to aggregate by path with hitCount. CRUD API for redirects with CORS. Redirects tab in Analytics dashboard and standalone page at /dashboards/redirects under Dashboard menu. POST /api/404-log now upserts by path.",
+    "status": "done",
+    "priority": "high",
+    "phase": 5,
+    "files": [
+      "prisma/schema.prisma",
+      "src/app/api/404-log/route.js",
+      "src/app/api/admin/errors/route.js",
+      "src/app/api/redirects/route.js",
+      "src/app/api/redirects/[id]/route.js",
+      "src/app/(protected-pages)/dashboards/analytic/_components/TabRedirects.jsx",
+      "src/app/(protected-pages)/dashboards/analytic/_components/AnalyticDashboard.jsx",
+      "src/app/(protected-pages)/dashboards/redirects/page.jsx",
+      "src/configs/routes.config/dashboardsRoute.js",
+      "src/configs/navigation.config/dashboards.navigation.config.js"
+    ]
+  },
+  {
     "id": "TASK-017",
     "title": "SMTP email notifications for form submissions",
     "description": "Send HTML email via nodemailer when a form is submitted. Fire-and-forget pattern. Requires SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_TO env vars.",

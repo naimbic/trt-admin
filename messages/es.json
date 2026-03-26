@@ -5,7 +5,8 @@
             "ecommerce": "Comercio electrónico",
             "analytic": "Analítica",
             "project": "Proyecto",
-            "marketing": "Marketing"
+            "marketing": "Marketing",
+            "redirects": "Redirecciones y 404"
         },
         "concepts": "Conceptos",
         "conceptsAi": {

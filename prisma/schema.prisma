@@ -501,16 +501,34 @@ model Submission {
   @@map("submissions")
 }
 
-// 404 error logs
+// 404 error logs (aggregated by path)
 model ErrorLog {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  url      String
-  referrer String?
-  ua       String?  // user agent
-  date     DateTime @default(now())
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  path       String   @unique
+  hitCount   Int      @default(1)
+  redirectId String?
+  referrer   String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  @@index([date])
+  @@index([hitCount])
   @@map("error_logs")
+}
+
+// URL redirects (managed by admin, consumed by frontend at build + runtime)
+model Redirect {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  from      String   @unique
+  to        String
+  type      Int      @default(301)
+  hits      Int      @default(0)
+  active    Boolean  @default(true)
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("redirects")
 }
 
 // ==================== CALENDAR ====================

@@ -20,11 +20,12 @@ export default auth((req) => {
     const isSignedIn = !!req.auth
 
     const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix)
+    const isApiRoute = nextUrl.pathname.startsWith(appConfig.apiPrefix)
     const isPublicRoute = publicRoutes.includes(nextUrl.pathname)
     const isAuthRoute = authRoutes.includes(nextUrl.pathname)
 
-    /** Skip auth middleware for api routes */
-    if (isApiAuthRoute) return
+    /** Skip auth middleware for all api routes — they handle auth internally */
+    if (isApiRoute) return
 
     if (isAuthRoute) {
         if (isSignedIn) {

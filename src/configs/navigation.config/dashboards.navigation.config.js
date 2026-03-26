@@ -60,6 +60,16 @@ const dashboardsNavigationConfig = [
                 authority: [ADMIN, USER, SUPERVISOR, SUPPORT, AUDITOR, REPORTS_READ],
                 subMenu: [],
             },
+            {
+                key: 'dashboard.redirects',
+                path: `${DASHBOARDS_PREFIX_PATH}/redirects`,
+                title: 'Redirects & 404s',
+                translateKey: 'nav.dashboard.redirects',
+                icon: 'documentation',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [ADMIN],
+                subMenu: [],
+            },
         ],
     },
 ]

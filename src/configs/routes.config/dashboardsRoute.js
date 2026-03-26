@@ -30,6 +30,13 @@ const dashboardsRoute = {
             pageBackgroundType: 'plain',
         },
     },
+    '/dashboards/redirects': {
+        key: 'dashboard.redirects',
+        authority: [ADMIN],
+        meta: {
+            pageContainerType: 'contained',
+        },
+    },
 }
 
 export default dashboardsRoute

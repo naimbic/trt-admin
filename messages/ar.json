@@ -5,7 +5,8 @@
             "ecommerce": "التجارة الإلكترونية",
             "analytic": "التحليلات",
             "project": "المشاريع",
-            "marketing": "التسويق"
+            "marketing": "التسويق",
+            "redirects": "إعادة التوجيه و 404"
         },
         "concepts": "المفاهيم",
         "conceptsAi": {

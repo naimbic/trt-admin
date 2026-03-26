@@ -4,14 +4,13 @@ import { corsHeaders, corsResponse } from '@/lib/cors'
 
 // In-memory rate limit: 1 per 5s per IP
 const rateLimitMap = new Map()
-// Dedup: skip same path within 60s
-const dedupMap = new Map()
 
 export async function OPTIONS(request) {
     return corsResponse(request)
 }
 
 // POST /api/404-log — log 404 errors (public, CORS)
+// Aggregates by path: upserts hitCount instead of creating one row per hit
 export async function POST(request) {
     const headers = corsHeaders(request)
     try {
@@ -37,22 +36,19 @@ export async function POST(request) {
             )
         }
 
-        // Dedup: skip if same path logged within 60s
-        const dedupKey = path
-        const lastLogged = dedupMap.get(dedupKey)
-        if (lastLogged && now - lastLogged < 60000) {
-            return NextResponse.json(
-                { data: { success: true, deduplicated: true }, error: null },
-                { headers }
-            )
-        }
-        dedupMap.set(dedupKey, now)
-
-        await prisma.errorLog.create({
-            data: {
-                url: path,
+        // Upsert: increment hitCount if path exists, create otherwise
+        await prisma.errorLog.upsert({
+            where: { path },
+            update: {
+                hitCount: { increment: 1 },
+                referrer: body.referrer || undefined,
+                userAgent: body.ua || undefined,
+            },
+            create: {
+                path,
+                hitCount: 1,
                 referrer: body.referrer || null,
-                ua: body.ua || null,
+                userAgent: body.ua || null,
             },
         })
 

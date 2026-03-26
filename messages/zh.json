@@ -5,7 +5,8 @@
             "ecommerce": "电子商务",
             "analytic": "分析",
             "project": "项目",
-            "marketing": "营销"
+            "marketing": "营销",
+            "redirects": "重定向和404"
         },
         "concepts": "概念",
         "conceptsAi": {

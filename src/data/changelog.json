@@ -1,5 +1,47 @@
 [
   {
+    "version": "2.3.4",
+    "date": "2026-03-25",
+    "type": "fix",
+    "message": "Fixed API routes being blocked by middleware auth redirect. Middleware now skips all /api/* routes — each API route handles its own auth internally. Fixed Redirects dashboard showing 0 errors. Added nav.dashboard.redirects translation key to all 4 locales (en/ar/es/zh). Fixed error_logs data migration (string dates, missing fields, deduplication).",
+    "files": [
+      "src/middleware.js",
+      "messages/en.json",
+      "messages/ar.json",
+      "messages/es.json",
+      "messages/zh.json",
+      "scripts/fix-error-logs.cjs"
+    ]
+  },
+  {
+    "version": "2.3.3",
+    "date": "2026-03-25",
+    "type": "feature",
+    "message": "Auto-redirect on 404 pages. Added GET /api/redirects/check?path= endpoint (public, CORS) that looks up active redirects and increments hit counter. Updated not-found.jsx to check for redirects on load and auto-redirect before showing the 404 page. Frontend can use the same endpoint.",
+    "files": [
+      "src/app/api/redirects/check/route.js",
+      "src/app/not-found.jsx"
+    ]
+  },
+  {
+    "version": "2.3.2",
+    "date": "2026-03-25",
+    "type": "feature",
+    "message": "Redirects & 404 management system. Added Redirect Prisma model and updated ErrorLog to aggregate by path with hitCount. CRUD API at /api/redirects with CORS. POST /api/404-log now upserts by path. Standalone page at /dashboards/redirects under Dashboard menu with summary cards, search, 404 errors table (sorted by hits, Fix button), redirects table (edit/toggle/delete), and create/edit dialog with 301/302 type selection.",
+    "files": [
+      "prisma/schema.prisma",
+      "src/app/api/404-log/route.js",
+      "src/app/api/admin/errors/route.js",
+      "src/app/api/redirects/route.js",
+      "src/app/api/redirects/[id]/route.js",
+      "src/app/(protected-pages)/dashboards/analytic/_components/TabRedirects.jsx",
+      "src/app/(protected-pages)/dashboards/redirects/page.jsx",
+      "src/app/(protected-pages)/dashboards/analytic/_components/AnalyticDashboard.jsx",
+      "src/configs/routes.config/dashboardsRoute.js",
+      "src/configs/navigation.config/dashboards.navigation.config.js"
+    ]
+  },
+  {
     "version": "2.3.1",
     "date": "2026-03-24",
     "type": "fix",
