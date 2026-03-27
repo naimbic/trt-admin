@@ -4,6 +4,8 @@ import prisma from '@/lib/prisma'
 import { auth } from '@/auth'
 import { corsHeaders, corsResponse } from '@/lib/cors'
 
+export const dynamic = 'force-dynamic'
+
 export async function OPTIONS(request) {
     return corsResponse(request)
 }

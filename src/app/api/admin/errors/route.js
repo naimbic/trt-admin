@@ -3,6 +3,8 @@ import { unstable_noStore as noStore } from 'next/cache'
 import prisma from '@/lib/prisma'
 import { auth } from '@/auth'
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/admin/errors — list 404 logs sorted by hitCount desc (admin auth required)
 export async function GET() {
     noStore()

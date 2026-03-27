@@ -42,8 +42,8 @@ const TabRedirects = () => {
         setLoading(true)
         try {
             const [errRes, redRes] = await Promise.all([
-                fetch('/api/admin/errors').then(r => r.json()),
-                fetch('/api/redirects').then(r => r.json()),
+                fetch('/api/admin/errors', { cache: 'no-store' }).then(r => r.json()),
+                fetch('/api/redirects', { cache: 'no-store' }).then(r => r.json()),
             ])
             setErrors(Array.isArray(errRes.data) ? errRes.data : [])
             setRedirects(Array.isArray(redRes.data) ? redRes.data : [])

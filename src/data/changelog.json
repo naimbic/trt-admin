@@ -1,5 +1,39 @@
 [
   {
+    "version": "2.3.9",
+    "date": "2026-03-27",
+    "type": "fix",
+    "message": "Fixed submissions showing 0 results. Migrated data had form:null and date stored as strings instead of BSON Date — Prisma strict typing rejected all reads silently. Backfilled 7 null form fields to 'contact', converted 7 string dates to proper BSON Date via $dateFromString. Made form field optional in Prisma schema to prevent future breakage. All 9 submissions and 13 error logs now load correctly.",
+    "files": [
+      "prisma/schema.prisma"
+    ]
+  },
+  {
+    "version": "2.3.8",
+    "date": "2026-03-27",
+    "type": "fix",
+    "message": "Fixed build error: Module not found 'apexcharts'. Installed missing apexcharts peer dependency required by react-apexcharts. Build was failing entirely, preventing all dashboard changes from deploying.",
+    "files": [
+      "package.json",
+      "package-lock.json"
+    ]
+  },
+  {
+    "version": "2.3.7",
+    "date": "2026-03-27",
+    "type": "fix",
+    "message": "Fixed 404 errors and submissions not refreshing from DB. Added export const dynamic = 'force-dynamic' to all data API routes (/api/admin/errors, /api/submissions, /api/redirects, /api/404-log, /api/changelog) to prevent Next.js static caching. Added cache:'no-store' to client-side fetch calls in TabRedirects and Submissions page. Data now always comes fresh from MongoDB on every page load.",
+    "files": [
+      "src/app/api/admin/errors/route.js",
+      "src/app/api/submissions/route.js",
+      "src/app/api/redirects/route.js",
+      "src/app/api/404-log/route.js",
+      "src/app/api/changelog/route.js",
+      "src/app/(protected-pages)/dashboards/analytic/_components/TabRedirects.jsx",
+      "src/app/(protected-pages)/dashboards/submissions/page.jsx"
+    ]
+  },
+  {
     "version": "2.3.6",
     "date": "2026-03-27",
     "type": "feature",

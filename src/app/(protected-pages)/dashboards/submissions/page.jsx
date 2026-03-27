@@ -45,7 +45,7 @@ const Page = () => {
         setLoading(true)
         try {
             const params = readFilter !== 'all' ? `?read=${readFilter === 'read'}` : ''
-            const res = await fetch(`/api/submissions${params}`)
+            const res = await fetch(`/api/submissions${params}`, { cache: 'no-store' })
             const json = await res.json()
             setSubmissions(Array.isArray(json.data) ? json.data : [])
         } catch { setSubmissions([]) }

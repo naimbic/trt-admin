@@ -6,6 +6,8 @@ import { corsHeaders, corsResponse } from '@/lib/cors'
 import { sendMail, buildSubmissionEmail } from '@/lib/mailer'
 import { createNotification } from '@/lib/notify'
 
+export const dynamic = 'force-dynamic'
+
 const VALID_FORMS = [
     'audit-seo', 'audit-ads', 'audit-web', 'audit-social',
     'audit-aeo', 'audit-analytics', 'audit-gratuit',

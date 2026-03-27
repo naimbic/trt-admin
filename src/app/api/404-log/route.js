@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { corsHeaders, corsResponse } from '@/lib/cors'
 
+export const dynamic = 'force-dynamic'
+
 // In-memory rate limit: 1 per 5s per IP
 const rateLimitMap = new Map()
 
