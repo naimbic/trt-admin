@@ -37,6 +37,13 @@ const dashboardsRoute = {
             pageContainerType: 'contained',
         },
     },
+    '/dashboards/submissions': {
+        key: 'dashboard.submissions',
+        authority: [ADMIN],
+        meta: {
+            pageContainerType: 'contained',
+        },
+    },
 }
 
 export default dashboardsRoute

@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server'
+import { unstable_noStore as noStore } from 'next/cache'
 import prisma from '@/lib/prisma'
 import { auth } from '@/auth'
 import { corsHeaders, corsResponse } from '@/lib/cors'
+import { sendMail, buildSubmissionEmail } from '@/lib/mailer'
+import { createNotification } from '@/lib/notify'
 
 const VALID_FORMS = [
     'audit-seo', 'audit-ads', 'audit-web', 'audit-social',
@@ -62,12 +65,35 @@ export async function POST(request) {
                 budget: body.budget || null,
                 deadline: body.deadline || null,
                 message: body.message || null,
+                read: false,
             },
         })
 
+        // Fire-and-forget: send email notification to team
+        sendMail(
+            `New ${formType} submission from ${name}`,
+            buildSubmissionEmail({ form: formType, name, email, ...body }),
+        ).catch(() => {})
+
+        // Fire-and-forget: notify all admin users in the dashboard
+        prisma.user.findMany({
+            where: { role: 'admin' },
+            select: { id: true },
+        }).then((admins) => {
+            for (const admin of admins) {
+                createNotification(
+                    admin.id,
+                    name,
+                    `New ${formType} submission from ${email}`,
+                    'info',
+                    null,
+                )
+            }
+        }).catch(() => {})
+
         return NextResponse.json(
             { data: { success: true, id: submission.id }, error: null },
-            { headers }
+            { status: 201, headers }
         )
     } catch (error) {
         console.error('POST /api/submissions error:', error)
@@ -80,6 +106,7 @@ export async function POST(request) {
 
 // GET /api/submissions — list all (admin auth required)
 export async function GET(request) {
+    noStore()
     try {
         const session = await auth()
         if (!session?.user) {

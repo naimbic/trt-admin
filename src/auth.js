@@ -7,8 +7,8 @@ import prisma from '@/lib/prisma'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     pages: {
-        signIn: appConfig.authenticatedEntryPath,
-        error: appConfig.authenticatedEntryPath,
+        signIn: appConfig.unAuthenticatedEntryPath,
+        error: appConfig.unAuthenticatedEntryPath,
     },
     ...authConfig,
     callbacks: {

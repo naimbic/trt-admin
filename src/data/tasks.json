@@ -235,11 +235,11 @@
   {
     "id": "TASK-017",
     "title": "SMTP email notifications for form submissions",
-    "description": "Send HTML email via nodemailer when a form is submitted. Fire-and-forget pattern. Requires SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_TO env vars.",
-    "status": "todo",
+    "description": "Send HTML email via nodemailer when a form is submitted. Fire-and-forget pattern. Requires SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_TO env vars. Created src/lib/mailer.js with transporter setup and styled HTML email builder. POST /api/submissions now sends email + creates admin notification on each submission.",
+    "status": "done",
     "priority": "medium",
     "phase": 5,
-    "files": []
+    "files": ["src/lib/mailer.js", "src/app/api/submissions/route.js"]
   },
   {
     "id": "TASK-018",

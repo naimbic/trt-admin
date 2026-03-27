@@ -70,6 +70,16 @@ const dashboardsNavigationConfig = [
                 authority: [ADMIN],
                 subMenu: [],
             },
+            {
+                key: 'dashboard.submissions',
+                path: `${DASHBOARDS_PREFIX_PATH}/submissions`,
+                title: 'Submissions',
+                translateKey: 'nav.dashboard.submissions',
+                icon: 'documentation',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [ADMIN],
+                subMenu: [],
+            },
         ],
     },
 ]

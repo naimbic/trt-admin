@@ -1,5 +1,34 @@
 [
   {
+    "version": "2.3.6",
+    "date": "2026-03-27",
+    "type": "feature",
+    "message": "Added Submissions dashboard page at /dashboards/submissions with summary cards (total/unread/read), searchable table with form type badges, read/unread Segment filter, pagination, and detail dialog. Nav entry added under Dashboard menu (admin-only) with translations in all 4 locales. Fixed changelog ordering — now sorts by date desc then id desc so entries on the same day appear in correct creation order.",
+    "files": [
+      "src/app/(protected-pages)/dashboards/submissions/page.jsx",
+      "src/configs/routes.config/dashboardsRoute.js",
+      "src/configs/navigation.config/dashboards.navigation.config.js",
+      "src/app/api/changelog/route.js",
+      "messages/en.json",
+      "messages/ar.json",
+      "messages/es.json",
+      "messages/zh.json"
+    ]
+  },
+  {
+    "version": "2.3.5",
+    "date": "2026-03-27",
+    "type": "feature",
+    "message": "Submissions now send SMTP email notification to team on POST (fire-and-forget via nodemailer). Admin users get in-app notification for each new submission. Added noStore() to GET /api/admin/errors, GET /api/submissions, and GET /api/redirects so 404 errors, submissions, and redirects always fetch fresh from DB on page refresh. POST /api/submissions now returns 201 and explicitly sets read:false. Created reusable src/lib/mailer.js with styled HTML email builder. Installed nodemailer@7.",
+    "files": [
+      "src/app/api/submissions/route.js",
+      "src/app/api/admin/errors/route.js",
+      "src/app/api/redirects/route.js",
+      "src/lib/mailer.js",
+      "package.json"
+    ]
+  },
+  {
     "version": "2.3.4",
     "date": "2026-03-25",
     "type": "fix",

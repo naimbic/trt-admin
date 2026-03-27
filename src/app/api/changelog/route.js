@@ -16,7 +16,7 @@ export async function GET(request) {
         const [entries, total] = await Promise.all([
             prisma.changelog.findMany({
                 where,
-                orderBy: { date: 'desc' },
+                orderBy: [{ date: 'desc' }, { id: 'desc' }],
                 skip,
                 take: limit,
             }),

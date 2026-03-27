@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { unstable_noStore as noStore } from 'next/cache'
 import prisma from '@/lib/prisma'
 import { auth } from '@/auth'
 import { corsHeaders, corsResponse } from '@/lib/cors'
@@ -9,6 +10,7 @@ export async function OPTIONS(request) {
 
 // GET /api/redirects — list all redirects (public for frontend build, CORS)
 export async function GET(request) {
+    noStore()
     const headers = corsHeaders(request)
     try {
         const { searchParams } = new URL(request.url)
