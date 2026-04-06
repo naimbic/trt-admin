@@ -1,5 +1,17 @@
 [
   {
+    "version": "2.4.1",
+    "date": "2026-04-07",
+    "type": "update",
+    "message": "Bumped package.json version from 1.2.7 to 2.4.0 to match changelog. Added APP_VERSION constant and displayed version (v2.4.0) in the app footer. Fixed changelog route build error caused by stray em dash comment on line 5.",
+    "files": [
+      "package.json",
+      "src/constants/app.constant.js",
+      "src/components/template/Footer.jsx",
+      "src/app/api/changelog/route.js"
+    ]
+  },
+  {
     "version": "2.4.0",
     "date": "2026-04-06",
     "type": "fix",
