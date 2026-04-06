@@ -1,5 +1,15 @@
 [
   {
+    "version": "2.4.0",
+    "date": "2026-04-06",
+    "type": "fix",
+    "message": "Hostinger deployment fix: switched Prisma generator to engineType \"binary\" (uses Node.js DNS instead of Rust resolver) and replaced mongodb+srv:// DATABASE_URL with direct mongodb:// connection string listing all 3 shard hosts. Bypasses Hostinger's broken /etc/resolv.conf that prevents SRV lookups and Prisma's Rust DNS from resolving.",
+    "files": [
+      "prisma/schema.prisma",
+      ".env"
+    ]
+  },
+  {
     "version": "2.3.9",
     "date": "2026-03-27",
     "type": "fix",
