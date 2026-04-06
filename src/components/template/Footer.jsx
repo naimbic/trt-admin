@@ -1,6 +1,6 @@
 import Container from '@/components/shared/Container'
 import classNames from '@/utils/classNames'
-import { APP_NAME } from '@/constants/app.constant'
+import { APP_NAME, APP_VERSION } from '@/constants/app.constant'
 import { PAGE_CONTAINER_GUTTER_X } from '@/constants/theme.constant'
 import Link from 'next/link'
 
@@ -13,6 +13,7 @@ const FooterContent = () => {
                 rights reserved.
             </span>
             <div className="">
+                <span className="text-gray-400 text-xs mr-4">v{APP_VERSION}</span>
                 <Link
                     className="text-gray"
                     href="/#"
