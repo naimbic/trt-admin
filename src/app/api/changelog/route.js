@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { auth } from '@/auth'
 
-export const dynamic = 'force-dynamic' — list changelog entries, optionally filtered by project, with pagination
+export const dynamic = 'force-dynamic'
 export async function GET(request) {
     try {
         const { searchParams } = new URL(request.url)
