@@ -1,5 +1,18 @@
 [
   {
+    "version": "2.4.5",
+    "date": "2026-04-07",
+    "type": "fix",
+    "message": "Hardened analytics page for Hostinger shared hosting. Restored Prisma binary engine type. Made getGoogleAnalytics fully resilient with try/catch and empty fallback. Switched Prisma queries to sequential execution to avoid EAGAIN process spawn limits. Analytics page loads server actions sequentially. Added --openssl-legacy-provider to build/start scripts for Google API OpenSSL 3 compatibility.",
+    "files": [
+      "prisma/schema.prisma",
+      "src/server/actions/getGoogleAnalytics.js",
+      "src/app/(protected-pages)/dashboards/analytic/page.jsx",
+      "src/lib/google-apis.js",
+      "package.json"
+    ]
+  },
+  {
     "version": "2.4.4",
     "date": "2026-04-07",
     "type": "fix",
