@@ -34,14 +34,16 @@ function slugToPath(slug) {
 
 export default async function getGoogleAnalytics() {
     noStore()
-    const startDate = dayjs().subtract(90, 'day').format('YYYY-MM-DD')
-    const endDate = dayjs().format('YYYY-MM-DD')
 
-    const ga4Configured = isGA4Configured()
-    const scConfigured = isSCConfigured()
+    try {
+        const startDate = dayjs().subtract(90, 'day').format('YYYY-MM-DD')
+        const endDate = dayjs().format('YYYY-MM-DD')
 
-    const [ga4, keywords, searchTraffic, scTopPages, devices, countries, indexedPaths, allPages, indexingLogs] =
-        await Promise.all([
+        const ga4Configured = isGA4Configured()
+        const scConfigured = isSCConfigured()
+
+        // Run Google API calls in parallel (external, no process spawning)
+        const googleResults = await Promise.allSettled([
             ga4Configured ? fetchGA4Visitors(startDate, endDate) : null,
             scConfigured ? fetchKeywordPositions(startDate, endDate) : null,
             scConfigured ? fetchSearchTraffic(startDate, endDate) : null,
@@ -49,12 +51,23 @@ export default async function getGoogleAnalytics() {
             scConfigured ? fetchDeviceBreakdown(startDate, endDate) : null,
             scConfigured ? fetchCountryBreakdown(startDate, endDate) : null,
             scConfigured ? fetchIndexedPages(startDate, endDate) : null,
-            prisma.pageStat.findMany({ orderBy: { views: 'desc' } }),
-            prisma.indexingLog.findMany({
+        ])
+
+        const [ga4, keywords, searchTraffic, scTopPages, devices, countries, indexedPaths] =
+            googleResults.map(r => r.status === 'fulfilled' ? r.value : null)
+
+        // Run Prisma queries sequentially to avoid EAGAIN on shared hosting
+        let allPages = []
+        let indexingLogs = []
+        try {
+            allPages = await prisma.pageStat.findMany({ orderBy: { views: 'desc' } })
+            indexingLogs = await prisma.indexingLog.findMany({
                 where: { action: { in: ['index', 'recheck', 'inspect'] } },
                 orderBy: { date: 'desc' },
-            }),
-        ])
+            })
+        } catch (dbErr) {
+            console.error('getGoogleAnalytics DB error:', dbErr.message)
+        }
 
     // Build indexed set from SC data (pages with impressions = visible in Google)
     const scIndexedSet = new Set((indexedPaths || []).map(p => p.replace(/\/$/, '') || '/'))
@@ -121,5 +134,19 @@ export default async function getGoogleAnalytics() {
         indexedPaths,
         pages,
         googleConfigured: { ga4: ga4Configured, sc: scConfigured },
+    }
+    } catch (err) {
+        console.error('getGoogleAnalytics fatal error:', err.message)
+        return {
+            ga4: null,
+            keywords: null,
+            searchTraffic: null,
+            topPages: null,
+            devices: null,
+            countries: null,
+            indexedPaths: null,
+            pages: [],
+            googleConfigured: { ga4: false, sc: false },
+        }
     }
 }

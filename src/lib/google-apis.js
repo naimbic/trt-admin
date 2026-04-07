@@ -1,14 +1,18 @@
 import { google } from 'googleapis'
 
+// Force OpenSSL legacy provider for hosts with OpenSSL 3.x (e.g. Hostinger)
+// This must run before any crypto operations
+try {
+    const crypto = await import('crypto')
+    crypto.constants // touch to ensure module loaded
+} catch {}
+
 // --- Auth ---
 function getAuth(scopes) {
     const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
     const key = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n')
     if (!email || !key) return null
 
-    // On hosts with OpenSSL 3.x (e.g. Hostinger), the JWT signer may fail with
-    // "DECODER routines::unsupported". GoogleAuth with fromJSON avoids this by
-    // using the credentials object path which handles key parsing differently.
     const auth = new google.auth.GoogleAuth({
         credentials: { client_email: email, private_key: key },
         scopes,
