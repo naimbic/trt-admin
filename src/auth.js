@@ -6,6 +6,7 @@ import validateCredential from '@/server/actions/user/validateCredential'
 import prisma from '@/lib/prisma'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+    trustHost: true,
     pages: {
         signIn: appConfig.unAuthenticatedEntryPath,
         error: appConfig.unAuthenticatedEntryPath,

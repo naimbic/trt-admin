@@ -8,6 +8,7 @@ import Google from 'next-auth/providers/google'
  */
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
+    trustHost: true,
     providers: [
         Github({
             clientId: process.env.GITHUB_AUTH_CLIENT_ID,
