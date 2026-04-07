@@ -5,7 +5,15 @@ function getAuth(scopes) {
     const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
     const key = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n')
     if (!email || !key) return null
-    return new google.auth.JWT({ email, key, scopes })
+
+    // On hosts with OpenSSL 3.x (e.g. Hostinger), the JWT signer may fail with
+    // "DECODER routines::unsupported". GoogleAuth with fromJSON avoids this by
+    // using the credentials object path which handles key parsing differently.
+    const auth = new google.auth.GoogleAuth({
+        credentials: { client_email: email, private_key: key },
+        scopes,
+    })
+    return auth
 }
 
 export function isGA4Configured() {
