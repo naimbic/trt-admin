@@ -1,5 +1,16 @@
 [
   {
+    "version": "2.4.3",
+    "date": "2026-04-07",
+    "type": "fix",
+    "message": "Fixed indexed page count dropping when Google APIs fail on Hostinger. Added 3-tier fallback: inspect result > SC impressions > views>0 heuristic. Improved Google API error logging with code/status. Added admin-only /api/debug/google diagnostic endpoint.",
+    "files": [
+      "src/server/actions/getGoogleAnalytics.js",
+      "src/lib/google-apis.js",
+      "src/app/api/debug/google/route.js"
+    ]
+  },
+  {
     "version": "2.4.2",
     "date": "2026-04-07",
     "type": "fix",
