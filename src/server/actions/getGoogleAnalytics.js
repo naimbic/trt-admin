@@ -58,6 +58,7 @@ export default async function getGoogleAnalytics() {
 
     // Build indexed set from SC data (pages with impressions = visible in Google)
     const scIndexedSet = new Set((indexedPaths || []).map(p => p.replace(/\/$/, '') || '/'))
+    const scDataAvailable = indexedPaths !== null && indexedPaths.length > 0
 
     // Build maps from indexing logs
     const lastPushMap = {}
@@ -77,13 +78,19 @@ export default async function getGoogleAnalytics() {
     const pages = allPages.map(ps => {
         const path = slugToPath(ps.slug)
         const normalizedPath = path.replace(/\/$/, '') || '/'
-        // Determine indexed: inspection API result > SC impressions data
+        // Determine indexed: inspection API result > SC impressions > optimistic fallback
         const inspection = inspectMap[ps.slug]
         let indexed = false
         if (inspection) {
+            // Trust inspect result (most accurate)
             indexed = inspection.verdict === 'PASS'
-        } else {
+        } else if (scDataAvailable) {
+            // SC data available — use impressions as proxy
             indexed = scIndexedSet.has(normalizedPath)
+        } else {
+            // No SC data (API failed) — don't mark everything as not-indexed
+            // Use last known inspect if available, otherwise assume indexed if page has views
+            indexed = ps.views > 0
         }
         const lastPush = lastPushMap[ps.slug] || null
         return {

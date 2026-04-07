@@ -42,7 +42,7 @@ export async function fetchGA4Visitors(startDate, endDate) {
             pageviews: parseInt(r.metricValues[2].value) || 0,
         }))
     } catch (e) {
-        console.error('fetchGA4Visitors error:', e.message)
+        console.error('fetchGA4Visitors error:', e.message, e.code, e.status)
         return null
     }
 }
@@ -59,7 +59,7 @@ async function scQuery(params) {
         })
         return res.data.rows || []
     } catch (e) {
-        console.error('scQuery error:', e.message)
+        console.error('scQuery error:', e.message, e.code, e.status)
         return null
     }
 }
