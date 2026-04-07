@@ -1,5 +1,14 @@
 [
   {
+    "version": "2.4.4",
+    "date": "2026-04-07",
+    "type": "fix",
+    "message": "Fixed Google APIs failing on Hostinger with OpenSSL 3 'DECODER routines::unsupported' error. Switched from google.auth.JWT to google.auth.GoogleAuth with credentials object, which handles private key parsing without hitting the raw OpenSSL PEM decoder.",
+    "files": [
+      "src/lib/google-apis.js"
+    ]
+  },
+  {
     "version": "2.4.3",
     "date": "2026-04-07",
     "type": "fix",
