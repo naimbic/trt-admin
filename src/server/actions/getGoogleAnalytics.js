@@ -91,18 +91,20 @@ export default async function getGoogleAnalytics() {
     const pages = allPages.map(ps => {
         const path = slugToPath(ps.slug)
         const normalizedPath = path.replace(/\/$/, '') || '/'
-        // Determine indexed: inspection API result > SC impressions > optimistic fallback
+        // Determine indexed: inspection PASS = indexed, NEUTRAL = unknown (fall through), FAIL = not indexed
         const inspection = inspectMap[ps.slug]
         let indexed = false
-        if (inspection) {
-            // Trust inspect result (most accurate)
-            indexed = inspection.verdict === 'PASS'
+        if (inspection && inspection.verdict === 'PASS') {
+            // Definitively indexed
+            indexed = true
+        } else if (inspection && inspection.verdict !== 'NEUTRAL') {
+            // Definitively not indexed (FAIL, etc.)
+            indexed = false
         } else if (scDataAvailable) {
-            // SC data available — use impressions as proxy
+            // NEUTRAL or no inspect — use SC impressions as proxy
             indexed = scIndexedSet.has(normalizedPath)
         } else {
-            // No SC data (API failed) — don't mark everything as not-indexed
-            // Use last known inspect if available, otherwise assume indexed if page has views
+            // No SC data (API failed) — assume indexed if page has views
             indexed = ps.views > 0
         }
         const lastPush = lastPushMap[ps.slug] || null
