@@ -1,5 +1,15 @@
 [
   {
+    "version": "2.4.6",
+    "date": "2026-04-17",
+    "type": "fix",
+    "message": "Fixed indexing tab showing only 7 pages as indexed. Google Inspection API NEUTRAL verdict was treated as not-indexed — now falls through to Search Console data or views heuristic. Synced package-lock.json to fix npm ci failures on DO deploy.",
+    "files": [
+      "src/server/actions/getGoogleAnalytics.js",
+      "package-lock.json"
+    ]
+  },
+  {
     "version": "2.4.5",
     "date": "2026-04-07",
     "type": "fix",
